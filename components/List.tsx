@@ -11,12 +11,14 @@ const List = <T extends Id,>(p: {
 		if (res)
 			store.priceList.fetch()
 	}
+
+	let isRem
 	
 	return !status ? <>загрузка</> : <div className={sty.list}>{
-		p.store.items.map((it, i) => <div key={i}>
+		p.store.items.map((it, i) => (isRem = it.id == p.store.removingId, <div key={i} className={isRem ? sty.disabled : undefined}>
 			{it['name']}
-			<i onClick={_ => remove(it.id)}>&ndash;</i>
-		</div>)
+			<i onClick={!isRem ? _ => remove(it.id) : undefined}>&ndash;</i>
+		</div>))
 	}</div>
 }
 

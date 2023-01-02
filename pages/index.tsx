@@ -1,11 +1,11 @@
 import {Fragment, useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
-import {Inter} from '@next/font/google'
+
 
 import {Price, PrismaClient, Product, Region} from '@prisma/client'
 
-import {NewItem, Select, List} from '../components'
+import {NewItem, Input, Select, List} from '../components'
 
 
 
@@ -24,23 +24,19 @@ import sty from '../styles/home.module.sass'
 
 
 
-const inter = Inter({subsets: ['latin']})
-
-
-
 
 
 const NewRegion = () =>
 	<NewItem name='region' store={[regionItem, regionList]}>
-		<input onChange={e => regionItem.value.name = e.target.value} />
-		<input onChange={e => regionItem.value.code = e.target.value} />
+		<Input placeholder='название' item={regionItem} fieldName='name' />
+		<Input placeholder='код' item={regionItem} fieldName='code' />
 	</NewItem>
 
 
 
 const NewProduct = () =>
 	<NewItem name='product' store={[productItem, productList]}>
-		<input onChange={e => productItem.value.name = e.target.value} />
+		<Input placeholder='название' item={productItem} fieldName='name' />
 	</NewItem>
 
 
@@ -48,9 +44,9 @@ const NewProduct = () =>
 
 const NewPrice = () => {
 	return <NewItem name='price' store={[priceItem, priceList]}>
-		<Select<Price> store={[priceItem, regionList]} valueName='regionId' />
-		<Select<Price> store={[priceItem, productList]} valueName='productId' />
-		<input onChange={e => priceItem.value.price = parseFloat(e.target.value)} />
+		<Select<Price> store={[priceItem, regionList]} fieldName='regionId' />
+		<Select<Price> store={[priceItem, productList]} fieldName='productId' />
+		<Input placeholder='название' item={priceItem} fieldName='price' asNumber />
 	</NewItem>
 }
 
@@ -66,27 +62,36 @@ type Props = {
 
 const PriceList = () => {
 	const st = priceList.useStatus()
-	const counts = {}
+	const groups = {}
 
 	const items = priceList.items.sort((it1, it2) =>
 		it1.regionId > it2.regionId ? 1 : -1
 	)
 
 	const region = (id: number) =>
-		!counts[id] && (
-			counts[id] = true, <b style={{ gridColumn: 'span 3' }}>{regionMap[id]}</b>
+		!groups[id] && (
+			groups[id] = true, <b>{regionMap[id]}</b>
 		)
 
-	return <div className={sty.prices}>{
+	let isRem
+
+	return !st ? <>загрузка</> : <div className={sty.prices}>{
 		items.map(it => <Fragment key={it.id}>
-			{region(it.regionId)}
-			<span>{productMap[it.productId]}</span>
-			<span>{it.price}</span>
-			<i onClick={_ => priceList.remove(it.id)}>&ndash;</i>
+			{(isRem = it.id == priceList.removingId, region(it.regionId))}
+			<span className={isRem ? sty.disabled : undefined}>{productMap[it.productId]}</span>
+			<span className={isRem ? sty.disabled : undefined}>{it.price}</span>
+			<i
+				className={isRem ? sty.wait : undefined}
+				onClick={!isRem ? _ => priceList.remove(it.id) : undefined}
+			>&ndash;</i>
 		</Fragment>)}
 	</div>
 }
 
+const Toggler = (p: { num, title }) => <>
+	<input type='radio' id={'toggler' + p.num} name='toggler' />
+	<label htmlFor={'toggler' + p.num}>{p.title}</label>
+</>
 
 const Home: NextPage<Props> = p => {
 	useEffect(() => {
@@ -110,14 +115,11 @@ const Home: NextPage<Props> = p => {
 
 			<main className={sty.main}>
 				<div className={sty.tabs}>
-					<input type='radio' id='toggler1' name='toggler' />
-					<label htmlFor='toggler1'>Регионы</label>
-					
-					<input type='radio' id='toggler2' name='toggler' />
-					<label htmlFor='toggler2'>Продукты</label>
-					
-					<input type='radio' id='toggler3' name='toggler' />
-					<label htmlFor='toggler3'>Цены</label>
+					{
+						['Регионы', 'Продукты', 'Цены'].map((it, i) =>
+							<Toggler num={i} title={it} />
+						)
+					}
 					
 					<div id='tab1'>
 						<List store={regionList} />

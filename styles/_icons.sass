@@ -1,40 +1,61 @@
 .check
+	position: relative
 	display: inline-block
 	transform: rotate(45deg)
 	height: 16px
 	width: 10px
-	border-bottom: 4px solid limegreen
-	border-right: 4px solid limegreen
+	border-bottom: 4px solid rgba(limegreen, 0.4)
+	border-right: 4px solid rgba(limegreen, 0.4)
+	transition: border .3s linear
+	&:hover
+		border-bottom-color: lime
+		border-right-color: lime
 
 .cancel
+	position: relative
+	height: 16px
+	width: 12px
+	vertical-align: middle
+	display: inline-block
+
 	&:before, &:after
 		position: absolute
 		left: 4px
-		top: 0
+		top: 2px
 		content: ' '
 		height: 16px
 		width: 3px
-		background-color: indianred
-	
+		background-color: lightsalmon
+		transition: background-color .3s linear
+
 	&:before
 		transform: rotate(45deg)
-	
+
 	&:after
 		transform: rotate(-45deg)
 
 
+	&:hover
+		&:before, &:after
+			background-color: red
+
 .remove
 	border-radius: 99px
+	color: whitesmoke
 	background: lightcoral
-	width: 16px
-	height: 16px
+	width: 18px
+	height: 18px
 	flex: 0 0 auto
 	text-align: center
-	font-size: 18px
+	font-size: 17px
 	font-style: normal
-	line-height: 0.7
+	line-height: 1
 	font-weight: bolder
 	cursor: pointer
-	transition: background-color 0.3s linear
+	transition: background-color .3s linear
 	&:hover
 		background: lightsalmon
+
+	&.wait
+		background: lightgray
+		cursor: default

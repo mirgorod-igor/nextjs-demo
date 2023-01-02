@@ -4,8 +4,9 @@ import {useStore} from '@nanostores/react'
 class List<T> {
 	private readonly type: ModelType
 	private _items: T[] = []
-	status = atom<api.Status | undefined>()
-	
+	status = atom<api.Status | 'removing' | undefined>()
+	removingId?: number
+
 	constructor(type: ModelType) {
 		this.type = type
 	}
@@ -33,18 +34,32 @@ class List<T> {
 	}
 	
 	async remove(id: number) {
-		const res = await fetch('/api/remove', {
-			method: 'DELETE',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ id, type: this.type })
-		})
-		if (res.ok) {
-			this.fetch()
+		this.removingId = id
+		this.status.set('removing')
+		try {
+			const res = await fetch('/api/remove', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ id, type: this.type })
+			})
+
+			if (res.ok) {
+				this.removingId = undefined
+				this.fetch()
+			}
+			else {
+				this.status.set('error')
+			}
+
+			return res.ok
 		}
-		
-		return res.ok
+		catch (e) {
+			this.status.set('net')
+		}
+
+		return false
 	}
 	
 	forceRefresh() {

@@ -14,14 +14,14 @@ const submit = (item: EditItem, list: List<any>) => {
 }
 
 
-const ToggleNew = (p: { id: string, item: EditItem }) =>
-	<span className={sty.toggleNew}>
+const ToggleNew = (p: { id: string, item: EditItem }) => {
+	return <span className={sty.toggleNew}>
 		<input
 			type='checkbox' id={p.id}
-			onClick={e => p.item.opened = e.currentTarget.checked} />
+			onClick={e => p.item.opened = e.currentTarget.checked}/>
 		<label htmlFor={p.id}> новая</label>
 	</span>
-
+}
 
 
 

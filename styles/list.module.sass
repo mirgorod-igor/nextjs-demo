@@ -1,12 +1,21 @@
 @use 'icons'
 
 .list
-	padding: 8px 4px
+	padding: 16px 12px
 	width: 100%
+
 	> div
 		display: flex
 		justify-content: space-between
 		align-items: center
+		&:not(:last-of-type)
+			margin-bottom: 8px
 		
 		> i
 			@extend .remove
+
+		&.disabled
+			color: lightgray
+			> i
+				@extend .wait
+
