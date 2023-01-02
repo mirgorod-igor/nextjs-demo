@@ -1,7 +1,7 @@
 import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
-class ListStore<T> {
+class List<T> {
 	private readonly type: ModelType
 	private _items: T[] = []
 	status = atom<api.Status | undefined>()
@@ -60,4 +60,4 @@ class ListStore<T> {
 }
 
 
-export default ListStore
+export default List

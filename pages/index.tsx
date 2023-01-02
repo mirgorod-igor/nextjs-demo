@@ -1,13 +1,23 @@
-import {Fragment, ReactElement, ReactNode, useEffect} from 'react'
-import Head from 'next/head'
-import Image from 'next/image'
-import {Inter} from '@next/font/google'
+import {Fragment, useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
+import Head from 'next/head'
+import {Inter} from '@next/font/google'
 
-import {Price, Prisma, PrismaClient, Product, Region} from '@prisma/client'
+import {Price, PrismaClient, Product, Region} from '@prisma/client'
 
-import EditItem from '../stores/EditItem'
-import ListStore from '../stores/ListStore'
+import {NewItem, Select, List} from '../components'
+
+
+
+import {
+	regionItem,
+	productItem,
+	priceItem,
+	priceList,
+	regionList,
+	productList,
+	regionMap, productMap
+} from '../stores'
 
 
 import sty from '../styles/home.module.sass'
@@ -17,106 +27,33 @@ import sty from '../styles/home.module.sass'
 const inter = Inter({subsets: ['latin']})
 
 
-const region = new EditItem<Region>('region')
-const product = new EditItem<Product>('product')
-const price = new EditItem<Price>('price')
 
 
-const regionList = new ListStore<Region>('region')
-const productList = new ListStore<Product>('product')
-const priceList = new ListStore<Price>('price')
 
-
-const submit = (newItem: EditItem, list: ListStore<any>) => {
-	newItem.submit().then(async st => {
-		if (st == 'ok') {
-			await list.fetch()
-			await priceList.forceRefresh()
-		}
-	})
-}
-
-const NewItem = (p: {
-	name: string
-	children: ReactNode
-	edit: EditItem
-	list: ListStore<any>
-}) => {
-	const opened = p.edit.useOpened()
-	return opened ? <div className={sty.newItem}>
-		{p.children}
-		<span onClick={_ => submit(p.edit, p.list)} />
-		<span onClick={_ => p.edit.cancel()} />
-	</div> : <ToggleNew id={'toggler_new_' + p.name} item={p.edit} />
-}
-
-const NewRegion = () => {
-	return <NewItem name='region' edit={region} list={regionList}>
-		<input onChange={e => region.value.name = e.target.value} />
-		<input onChange={e => region.value.code = e.target.value} />
+const NewRegion = () =>
+	<NewItem name='region' store={[regionItem, regionList]}>
+		<input onChange={e => regionItem.value.name = e.target.value} />
+		<input onChange={e => regionItem.value.code = e.target.value} />
 	</NewItem>
-}
 
 
-const NewProduct = () => {
-	return <NewItem name='product' edit={product} list={productList}>
-		<input onChange={e => product.value.name = e.target.value} />
+
+const NewProduct = () =>
+	<NewItem name='product' store={[productItem, productList]}>
+		<input onChange={e => productItem.value.name = e.target.value} />
 	</NewItem>
-}
 
 
-const Select = <T,>(p: { store: [EditItem<T>, ListStore<any>], valueName: keyof T }) => {
-	p.store[1].useStatus()
-	return <select onChange={e =>
-		//@ts-ignore
-		p.store[0].value[p.valueName] = parseInt(e.target.value)
-	}>
-		<option value={undefined}>выберите</option>
-		{
-			p.store[1].items.map(it =>
-				<option key={it.id} value={it.id}>{it.name}</option>
-			)
-		}
-	</select>
-}
+
 
 const NewPrice = () => {
-	return <NewItem name='price' edit={price} list={priceList}>
-		<Select<Price> store={[price, regionList]} valueName='regionId' />
-		<Select<Price> store={[price, productList]} valueName='productId' />
-		<input onChange={e => price.value.price = parseFloat(e.target.value)} />
+	return <NewItem name='price' store={[priceItem, priceList]}>
+		<Select<Price> store={[priceItem, regionList]} valueName='regionId' />
+		<Select<Price> store={[priceItem, productList]} valueName='productId' />
+		<input onChange={e => priceItem.value.price = parseFloat(e.target.value)} />
 	</NewItem>
 }
 
-
-
-const ToggleNew = (p: { id: string, item: EditItem }) => {
-	return <span className={sty.toggleNew}>
-		<input
-			type='checkbox' id={p.id}
-			onClick={e => p.item.opened = e.currentTarget.checked} />
-		<label htmlFor={p.id}> новая</label>
-	</span>
-}
-
-
-const List = <T extends Id,>(p: {
-	store: ListStore<T>
-}) => {
-	const status = p.store.useStatus()
-	const remove = async (id: number) => {
-		const res = await p.store.remove(id)
-		if (res)
-			priceList.fetch()
-	}
-	
-	return !status ? <>загрузка</> : <div className={sty.list}>{
-		p.store.items.map((it, i) => <div key={i}>
-			{it['name']}
-			<i onClick={_ => remove(it.id)}>&ndash;</i>
-		</div>)
-	}</div>
-}
 
 
 
@@ -126,37 +63,30 @@ type Props = {
 	prices: Price[]
 }
 
-const regionMap: Record<number, string> = {}
-const productMap: Record<number, string> = {}
-
-regionList.status.subscribe(v => {
-	regionList.items.map(it => regionMap[it.id] = it.name)
-})
-
-productList.status.subscribe(v => {
-	productList.items.map(it => productMap[it.id] = it.name)
-})
 
 const PriceList = () => {
 	const st = priceList.useStatus()
 	const counts = {}
+
 	const items = priceList.items.sort((it1, it2) =>
 		it1.regionId > it2.regionId ? 1 : -1
 	)
-	const render = (it: Price) =>
-		!counts[it.regionId] && (
-			counts[it.regionId] = true, <b style={{ gridColumn: 'span 3' }}>{regionMap[it.regionId]}</b>
+
+	const region = (id: number) =>
+		!counts[id] && (
+			counts[id] = true, <b style={{ gridColumn: 'span 3' }}>{regionMap[id]}</b>
 		)
 
 	return <div className={sty.prices}>{
 		items.map(it => <Fragment key={it.id}>
-			{render(it)}
+			{region(it.regionId)}
 			<span>{productMap[it.productId]}</span>
 			<span>{it.price}</span>
 			<i onClick={_ => priceList.remove(it.id)}>&ndash;</i>
 		</Fragment>)}
 	</div>
 }
+
 
 const Home: NextPage<Props> = p => {
 	useEffect(() => {

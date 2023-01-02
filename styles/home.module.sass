@@ -1,3 +1,5 @@
+@use 'icons'
+
 .main
 	display: flex
 	flex-direction: column
@@ -5,46 +7,6 @@
 	align-items: center
 	padding: 6rem
 
-.check
-	display: inline-block
-	transform: rotate(45deg)
-	height: 16px
-	width: 10px
-	border-bottom: 4px solid limegreen
-	border-right: 4px solid limegreen
-
-.cancel
-	&:before, &:after
-		position: absolute
-		left: 4px
-		top: 0
-		content: ' '
-		height: 16px
-		width: 3px
-		background-color: indianred
-
-	&:before
-		transform: rotate(45deg)
-	
-	&:after
-		transform: rotate(-45deg)
-
-		
-.remove
-	border-radius: 99px
-	background: lightcoral
-	width: 16px
-	height: 16px
-	flex: 0 0 auto
-	text-align: center
-	font-size: 18px
-	font-style: normal
-	line-height: 0.7
-	font-weight: bolder
-	cursor: pointer
-	transition: background-color 0.3s linear
-	&:hover
-		background: lightsalmon
 
 
 .prices
@@ -52,24 +14,14 @@
 	grid-template-columns: repeat(3, 1fr)
 	column-gap: 8px
 	row-gap: 4px
+	padding: 8px 4px
 	
 	i
 		@extend .remove
 		justify-self: end
 
 
-.list
-	padding: 8px 4px
-	width: 100%
-	> div
-		display: flex
-		justify-content: space-between
-		align-items: center
-		
-		> i
-			@extend .remove
-			
-			
+
 .toggleNew
 	display: block
 	label, input
@@ -86,7 +38,6 @@
 			display: inline-block
 			vertical-align: middle
 			border-radius: 99px
-			border: 1px solid steelblue
 			background: steelblue
 			color: white
 			width: 22px
@@ -94,6 +45,10 @@
 			line-height: 1
 			font-size: 22px
 			font-weight: bolder
+			transition: background-color .3s linear
+			cursor: pointer
+		&:hover:before
+			background: cornflowerblue
 
 		
 		
@@ -139,7 +94,6 @@
 				//color: whitesmoke
 				border-color: lightblue
 				background: lightblue
-				
 				
 						
 			
