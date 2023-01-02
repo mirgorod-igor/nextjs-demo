@@ -1,0 +1,149 @@
+.main
+	display: flex
+	flex-direction: column
+	justify-content: space-between
+	align-items: center
+	padding: 6rem
+
+.check
+	display: inline-block
+	transform: rotate(45deg)
+	height: 16px
+	width: 10px
+	border-bottom: 4px solid limegreen
+	border-right: 4px solid limegreen
+
+.cancel
+	&:before, &:after
+		position: absolute
+		left: 4px
+		top: 0
+		content: ' '
+		height: 16px
+		width: 3px
+		background-color: indianred
+
+	&:before
+		transform: rotate(45deg)
+	
+	&:after
+		transform: rotate(-45deg)
+
+		
+.remove
+	border-radius: 99px
+	background: lightcoral
+	width: 16px
+	height: 16px
+	flex: 0 0 auto
+	text-align: center
+	font-size: 18px
+	font-style: normal
+	line-height: 0.7
+	font-weight: bolder
+	cursor: pointer
+	transition: background-color 0.3s linear
+	&:hover
+		background: lightsalmon
+
+
+.prices
+	display: grid
+	grid-template-columns: repeat(3, 1fr)
+	column-gap: 8px
+	row-gap: 4px
+	
+	i
+		@extend .remove
+		justify-self: end
+
+
+.list
+	padding: 8px 4px
+	width: 100%
+	> div
+		display: flex
+		justify-content: space-between
+		align-items: center
+		
+		> i
+			@extend .remove
+			
+			
+.toggleNew
+	display: block
+	label, input
+		display: none
+	
+	label
+		display: inline-block
+		vertical-align: middle
+		position: relative
+		
+		&:before
+			content: '+'
+			text-align: center
+			display: inline-block
+			vertical-align: middle
+			border-radius: 99px
+			border: 1px solid steelblue
+			background: steelblue
+			color: white
+			width: 22px
+			height: 22px
+			line-height: 1
+			font-size: 22px
+			font-weight: bolder
+
+		
+		
+.newItem
+	position: relative
+	span
+		position: relative
+		&:first-of-type
+			@extend .check
+			left: 10px
+			
+		&:last-of-type
+			@extend .cancel
+			left: 20px
+	
+.tabs
+	display: grid
+	grid-template-columns: repeat(3, 1fr)
+	
+	div
+		grid-column: span 3
+	
+	hr
+		margin-bottom: 8px
+		height: 1px
+		
+	
+	> input
+		display: none
+		
+		~ div
+			display: none
+		
+		& + label
+			padding: 8px
+			line-height: 1.5
+			border: 1px solid lightskyblue
+			border-start-start-radius: 12px
+			
+		
+		&:checked
+			+ label
+				//color: whitesmoke
+				border-color: lightblue
+				background: lightblue
+				
+				
+						
+			
+			&:first-of-type ~ div:first-of-type,
+			&:nth-of-type(2) ~ div:nth-of-type(2),
+			&:last-of-type ~ div:last-of-type
+				display: block
