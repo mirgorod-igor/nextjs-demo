@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "vercel-build": "prisma db push && prisma db seed && next build",
     "prisma:migrate-init": "npx prisma migrate dev --name init",
     "prisma:migrate-dev": "npx prisma migrate dev",
     "prisma:migrate-reset": "npx prisma migrate reset",
