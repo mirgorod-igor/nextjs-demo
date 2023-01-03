@@ -1,25 +1,28 @@
 import * as store from '../stores'
 
+import {RemoveToggler} from '.'
+
+
 import sty from '../styles/list.module.sass'
 
-const List = <T extends Id,>(p: {
-	store: store.List<T>
-}) => {
-	const status = p.store.useStatus()
-	const remove = async (id: number) => {
-		const res = await p.store.remove(id)
-		if (res)
-			store.priceList.fetch()
-	}
 
-	let isRem
+const Item = <T extends Id,>(p: T & { store: store.RemoveItem }) => {
+
+	return <RemoveToggler id={p.id} store={p.store}>
+		<span>{p['name']}</span>
+	</RemoveToggler>
+}
+
+const List = <T extends Id,>(p: {
+	store: [store.List<T>, store.RemoveItem]
+}) => {
+	const status = p.store[0].useStatus()
 	
-	return !status ? <>загрузка</> : <div className={sty.list}>{
-		p.store.items.map((it, i) => (isRem = it.id == p.store.removingId, <div key={i} className={isRem ? sty.disabled : undefined}>
-			{it['name']}
-			<i onClick={!isRem ? _ => remove(it.id) : undefined}>&ndash;</i>
-		</div>))
-	}</div>
+	return !status ? <div className={sty.loading}>загрузка</div> : <div className={sty.list}>
+		{
+			p.store[0].items.map((it, i) => <Item key={i} store={p.store[1]} {...it} />)
+		}
+	</div>
 }
 
 

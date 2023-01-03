@@ -7,7 +7,8 @@
 	align-items: center
 	padding: 6rem
 
-
+.loading
+	padding: 16px
 
 .prices
 	display: grid
@@ -16,16 +17,31 @@
 	row-gap: 8px
 	padding: 16px 12px
 
-	.disabled
-		color: lightgray
+
 	b
 		grid-column: span 3
 		&:not(:first-of-type)
 			border-top: 1px solid #CCCCCC
 			padding-top: 4px
-	i
+	label
 		@extend .remove
 		justify-self: end
+
+	input[type=radio]
+		display: none
+
+		&:checked
+			& + span
+				color: lightgray
+				& + span
+					color: lightgray
+					& + label
+						@extend .wait
+
+		&:global(.error) + span
+			color: red
+			& + span
+				color: red
 
 
 

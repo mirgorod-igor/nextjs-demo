@@ -1,11 +1,11 @@
-import {Fragment, useEffect} from 'react'
+import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
 
 
 import {Price, PrismaClient, Product, Region} from '@prisma/client'
 
-import {NewItem, Input, Select, List} from '../components'
+import {NewItem, Input, Select, List, RemoveToggler} from '../components'
 
 
 
@@ -16,7 +16,7 @@ import {
 	priceList,
 	regionList,
 	productList,
-	regionMap, productMap
+	regionMap, productMap, removePrice, removeRegion, removeProduct
 } from '../stores'
 
 
@@ -60,31 +60,37 @@ type Props = {
 }
 
 
+const PriceItem = (p: { item: Price }) => {
+
+	return <RemoveToggler id={p.item.id} store={removePrice}>
+		<span>{productMap[p.item.productId]}</span>
+		<span>{p.item.price}</span>
+	</RemoveToggler>
+}
+
 const PriceList = () => {
 	const st = priceList.useStatus()
-	const groups = {}
 
 	const items = priceList.items.sort((it1, it2) =>
 		it1.regionId > it2.regionId ? 1 : -1
 	)
 
+
+	const show = {}
+
 	const region = (id: number) =>
-		!groups[id] && (
-			groups[id] = true, <b>{regionMap[id]}</b>
+		!show[id] && (
+			show[id] = true, <b>{regionMap[id]}</b>
 		)
 
-	let isRem
 
-	return !st ? <>загрузка</> : <div className={sty.prices}>{
-		items.map(it => <Fragment key={it.id}>
-			{(isRem = it.id == priceList.removingId, region(it.regionId))}
-			<span className={isRem ? sty.disabled : undefined}>{productMap[it.productId]}</span>
-			<span className={isRem ? sty.disabled : undefined}>{it.price}</span>
-			<i
-				className={isRem ? sty.wait : undefined}
-				onClick={!isRem ? _ => priceList.remove(it.id) : undefined}
-			>&ndash;</i>
-		</Fragment>)}
+	return !st ? <div className={sty.loading}>загрузка</div> : <div className={sty.prices}>
+		{
+			items.map(it => <>
+				{region(it.regionId)}
+				<PriceItem key={it.id} item={it} />
+			</>)
+		}
 	</div>
 }
 
@@ -122,12 +128,12 @@ const Home: NextPage<Props> = p => {
 					}
 					
 					<div id='tab1'>
-						<List store={regionList} />
+						<List store={[regionList, removeRegion]} />
 						<hr />
 						<NewRegion />
 					</div>
 					<div id='tab2'>
-						<List store={productList} />
+						<List store={[productList, removeProduct]} />
 						<hr />
 						<NewProduct />
 					</div>

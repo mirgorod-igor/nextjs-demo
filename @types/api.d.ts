@@ -1,5 +1,5 @@
 module api {
-	type Status = 'ok' | 'net' | 'error'
+	type Status = 'ok' | 'wait' | 'net' | 'error'
 	
 	type PagedList<T> = {
 		items: T[]
