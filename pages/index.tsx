@@ -1,19 +1,17 @@
+import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
 
-
 import {Price} from '@prisma/client'
 
-import {NewItem, Input, Select, List, RemoveToggler} from '../components'
 
+import {NewItem, Input, Select, List, RemoveToggler} from '../components'
 
 import {
 	region, product, price,
 	regionMap, productMap
 } from '../stores'
-
 import sty from '../styles/home.module.sass'
-import {useEffect} from "react";
 
 
 
@@ -45,9 +43,7 @@ const NewPrice = () => {
 
 
 type Props = {
-	/*regions: Region[]
-	products: Product[]
-	prices: Price[]*/
+
 }
 
 
@@ -137,15 +133,12 @@ const Home: NextPage<Props> = p => {
 
 export default Home
 
+
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-	/*const prisma = new PrismaClient()
-	const regions = await prisma.region.findMany()
-		, products = await prisma.product.findMany()
-		, prices = await prisma.price.findMany()*/
-	//console.log(regions)
+
 	return {
 		props: {
-			//regions, products, prices
+
 		}
 	}
 }

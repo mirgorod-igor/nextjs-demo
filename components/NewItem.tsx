@@ -1,5 +1,5 @@
 import {ReactNode} from 'react'
-import {price} from '../stores'
+
 
 import sty from '../styles/home.module.sass'
 

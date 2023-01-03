@@ -4,7 +4,7 @@ import EditItem from './EditItem'
 import RemoveItem from './RemoveItem'
 import List from './List'
 
-export { EditItem, RemoveItem, List }
+
 
 const compose = <T,>(type: ModelType) => ({
 	edit: new EditItem<T>(type),

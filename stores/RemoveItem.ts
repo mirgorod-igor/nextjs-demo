@@ -1,6 +1,7 @@
-import Api from './Api'
 import {atom, WritableAtom} from 'nanostores'
-import {useStore} from "@nanostores/react"
+import {useStore} from '@nanostores/react'
+
+import Api from './Api'
 
 
 class RemoveItem extends Api implements store.Remove {

@@ -38,6 +38,9 @@
 					& + label
 						@extend .wait
 
+		&:global(.wait) + span + span + label
+			background: url(/svg/loading.svg)
+
 		&:global(.error) + span
 			color: red
 			& + span
