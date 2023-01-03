@@ -6,13 +6,15 @@ type IdName = Id & {
 	name
 }
 
-type ModelType = 'region' | 'product' | 'price'
+
+type ModelType = 'region' | 'product' | 'price' | 'org'
+
 
 module store {
 	interface Api {
 		readonly status: api.Status|undefined
 		useStatus(): api.Status|undefined
-		onStatus(listener: (st: api.Status|undefined) => void)
+		listenStatus(listener: (st: api.Status|undefined) => void)
 	}
 
 	interface Edit<T> extends Api {
@@ -23,9 +25,11 @@ module store {
 		value: T
 	}
 
+	type ItemsListener<T> = ((items: T[]) => void)
 	interface List<T> extends Api {
 		items: T[]
 		fetch(): Promise<boolean>
+		listenItems(listener: ItemsListener<T>)
 	}
 
 	interface Remove extends Api {
@@ -38,5 +42,6 @@ module store {
 		list: List<T>
 		remove: Remove
 	}
+
 }
 

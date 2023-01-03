@@ -2,9 +2,9 @@ import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
 
-import {NewItem, Input, Select, List, PriceList} from '../components'
+import {NewItem, Input, Select, List, PriceList, OrgList} from '../components'
 
-import { region, product, price } from '../stores'
+import {region, product, price, org} from '../stores'
 
 import sty from '../styles/home.module.sass'
 
@@ -17,6 +17,20 @@ const NewRegion = () =>
 		<Input placeholder='код' edit={region.edit} fieldName='code' />
 	</NewItem>
 
+const NewOrg = () =>
+	<NewItem name='org' store={org.edit}>
+		<Input placeholder='название' edit={org.edit} fieldName='name' />
+		<Select edit={org.edit} list={region.list} fieldName='regionId' />
+		<Input placeholder='юр. адрес' edit={org.edit} fieldName='legalAddr' />
+		<label>
+			опт
+			<input defaultChecked type='radio' name='trade' value='w' />
+		</label>
+		<label>
+			роз
+			<input type='radio' name='trade' value='r' />
+		</label>
+	</NewItem>
 
 
 const NewProduct = () =>
@@ -53,7 +67,10 @@ const Home: NextPage<Props> = p => {
 		Promise.all([
 			region.list.fetch(),
 			product.list.fetch()
-		]).then(() => price.list.fetch())
+		]).then(() => {
+			org.list.fetch()
+			price.list.fetch()
+		})
 	}, [])
 
 	return <>
@@ -67,7 +84,7 @@ const Home: NextPage<Props> = p => {
 		<main className={sty.main}>
 			<div className={sty.tabs}>
 				{
-					['Регионы', 'Продукты', 'Цены'].map((it, i) =>
+					['Регионы', 'Производители', 'Продукты', 'Цены'].map((it, i) =>
 						<TabButton key={i} num={i} title={it} />
 					)
 				}
@@ -76,6 +93,11 @@ const Home: NextPage<Props> = p => {
 					<List store={region} />
 					<hr />
 					<NewRegion />
+				</div>
+				<div>
+					<OrgList />
+					<hr />
+					<NewOrg />
 				</div>
 				<div>
 					<List store={product} />

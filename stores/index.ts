@@ -1,4 +1,4 @@
-import {Price, Product, Region} from '@prisma/client'
+import {Trade, Price, Product, Region, Org} from '@prisma/client'
 
 import EditItem from './EditItem'
 import RemoveItem from './RemoveItem'
@@ -16,13 +16,18 @@ export const
 	region = compose<Region>('region'),
 	product = compose<Product>('product'),
 	price = compose<Price>('price'),
+	org = compose<Org>('org'),
 
 	regionMap: Record<number, string> = {},
-	productMap: Record<number, string> = {}
+	productMap: Record<number, string> = {},
+	tradeMap: Record<Trade, string> = {
+		w: 'опт',
+		r: 'роз'
+	}
 
 
-for (const store of [region, product, price])
-	store.edit.onStatus(st => {
+for (const store of [region, org, product, price])
+	store.edit.listenStatus(st => {
 		if (st == 'ok') {
 			store.list.fetch()
 		}
@@ -30,33 +35,41 @@ for (const store of [region, product, price])
 
 
 
-region.remove.onStatus(st => {
+region.remove.listenStatus(async st => {
 	if (st == 'ok') {
-		region.list.fetch()
+		await region.list.fetch()
+		org.list.fetch()
+		price.list.fetch()
+	}
+})
+
+org.remove.listenStatus(async st => {
+	if (st == 'ok') {
+		await org.list.fetch()
 		price.list.fetch()
 	}
 })
 
 
-product.remove.onStatus(st => {
+product.remove.listenStatus(async st => {
 	if (st == 'ok') {
-		product.list.fetch()
+		await product.list.fetch()
 		price.list.fetch()
 	}
 })
 
 
-price.remove.onStatus(st => {
+price.remove.listenStatus(st => {
 	if (st == 'ok')
 		price.list.fetch()
 })
 
 
 
-region.list.onStatus(v => {
-	region.list.items.map(it => regionMap[it.id] = it.name)
+region.list.listenItems(items => {
+	items.map(it => regionMap[it.id] = it.name)
 })
 
-product.list.onStatus(v => {
-	product.list.items.map(it => productMap[it.id] = it.name)
+product.list.listenItems(items => {
+	items.map(it => productMap[it.id] = it.name)
 })

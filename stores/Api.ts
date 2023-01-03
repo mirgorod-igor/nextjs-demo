@@ -44,8 +44,8 @@ class Api implements store.Api {
         return res
     }
 
-    onStatus(listener: (st: api.Status|undefined) => void) {
-        this._status.subscribe(listener)
+    listenStatus(listener: (st: api.Status|undefined) => void) {
+        this._status.listen(listener)
     }
 
     useStatus() {

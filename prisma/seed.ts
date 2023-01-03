@@ -1,20 +1,12 @@
+import * as fs from 'fs'
+import * as path from 'path'
+import * as csv from 'fast-csv'
+
 import {PrismaClient, Prisma, Region, Product} from '@prisma/client'
 
-console.log('start seeding')
 
-const regions: Prisma.RegionCreateInput[] = [
-	{
-		name: 'Омск',
-		code: 'OMS'
-	},
-	{
-		name: 'Москва',
-		code: 'MOW'
-	},
-	{
-		name: 'Санкт-Петербург',
-		code: 'SPE'
-	}
+const regions: Prisma.RegionCreateManyInput[] = [
+
 ]
 
 const products: Prisma.ProductCreateInput[] = [
@@ -29,26 +21,44 @@ const products: Prisma.ProductCreateInput[] = [
 	}
 ]
 
+const orgs: Prisma.OrgCreateManyInput[] = [
+	{
+		name: 'ООО «Зерно-трейд»',
+		regionId: 501165,
+		trade: 'w',
+		legalAddr: 'ул. Комсомольский Спуск, д.1, 4 этаж, комната 18'
+	}
+]
+
+
+const readRegions = (resolve: (value: Region[]) => void) =>
+	fs.createReadStream(path.resolve(__dirname, 'region.csv'))
+		.pipe(csv.parse({ headers: true }))
+		.on('error', error => console.error(error))
+		.on('data', row => regions.push({
+			id: parseInt(row.geoname_id),
+			name: row.name,
+			code: row.iso_code,
+		}))
+		.on('end', (rowCount: number) => {
+			console.log(`Parsed ${rowCount} rows`)
+			resolve(regions)
+		})
+
+
 const main = async () => {
+	const regions = await (new Promise<Region[]>(readRegions))
 	const prisma = new PrismaClient()
-	
+
 	try {
-		console.log('insert regions')
-		const mapReg: Record<string, Region> = {}
-		for (const data of regions) {
-			const reg = await prisma.region.create({
-				data,
-			})
-			
-			mapReg[reg.code] = reg
-		}
-		
-		for (const data of products) {
-			const p = await prisma.product.create({
-				data,
-			})
-		}
-		
+		await prisma.region.createMany({
+			data: regions
+		})
+
+		await prisma.org.createMany({
+			data: orgs
+		})
+
 	}
 	finally {
 		await prisma.$disconnect()

@@ -48,6 +48,11 @@
 			& + span
 				color: red
 
+.orgs
+	@extend .prices
+	grid-template-columns: repeat(4, 1fr)
+	b
+		grid-column: span 4
 
 
 .toggleNew
@@ -94,10 +99,10 @@
 	
 .tabs
 	display: grid
-	grid-template-columns: repeat(3, 1fr)
+	grid-template-columns: repeat(4, 1fr)
 	
 	div
-		grid-column: span 3
+		grid-column: span 4
 	
 	hr
 		margin-bottom: 8px
@@ -132,5 +137,6 @@
 			
 			&:first-of-type ~ div:first-of-type,
 			&:nth-of-type(2) ~ div:nth-of-type(2),
+			&:nth-of-type(3) ~ div:nth-of-type(3),
 			&:last-of-type ~ div:last-of-type
 				display: block

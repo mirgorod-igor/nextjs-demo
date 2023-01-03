@@ -8,24 +8,42 @@ datasource db {
 }
 
 model Region {
-  id    Int     @id @default(autoincrement())
-  name  String
-  code  String
-  Price Price[]
+  id     Int     @id
+  name   String
+  code   String
+  prices Price[]
+  orgs   Org[]
 
   @@map("regions")
 }
 
 model Product {
-  id    Int     @id @default(autoincrement())
-  name  String
-  Price Price[]
+  id     Int     @id @default(autoincrement())
+  name   String
+  prices Price[]
 
   @@map("products")
 }
 
+model Org {
+  id        Int    @id @default(autoincrement())
+  name      String
+  trade     Trade  @default(w)
+  regionId  Int
+  legalAddr String
+
+  region Region @relation(fields: [regionId], references: [id], onDelete: Cascade)
+
+  @@map("orgs")
+}
+
+enum Trade {
+  w
+  r
+}
+
 model Price {
-  id        Int @id @default(autoincrement())
+  id        Int   @id @default(autoincrement())
   productId Int
   regionId  Int
   price     Float

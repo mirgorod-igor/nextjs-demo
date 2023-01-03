@@ -5,3 +5,4 @@ export {default as RemoveToggler} from './RemoveToggler'
 export {default as Select} from './Select'
 
 export {default as PriceList} from './PriceList'
+export {default as OrgList} from './OrgList'

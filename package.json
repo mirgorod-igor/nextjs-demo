@@ -32,8 +32,10 @@
     "typescript": "4.9.4"
   },
   "devDependencies": {
+    "@fast-csv/parse": "4.3.6",
     "@types/next-auth": "3.13.0",
     "@svgr/webpack": "6.5.1",
+    "fast-csv": "4.3.6",
     "sass": "1.57.1",
     "prisma": "4.8.0",
     "ts-node": "10.9.1"
