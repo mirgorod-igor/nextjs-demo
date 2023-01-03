@@ -2,16 +2,12 @@ import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
 
-import {Price} from '@prisma/client'
+import {NewItem, Input, Select, List, PriceList} from '../components'
 
+import { region, product, price } from '../stores'
 
-import {NewItem, Input, Select, List, RemoveToggler} from '../components'
-
-import {
-	region, product, price,
-	regionMap, productMap
-} from '../stores'
 import sty from '../styles/home.module.sass'
+
 
 
 
@@ -47,41 +43,7 @@ type Props = {
 }
 
 
-const PriceItem = (p: { item: Price }) => {
-
-	return <RemoveToggler id={p.item.id} store={price.remove}>
-		<span>{productMap[p.item.productId]}</span>
-		<span>{p.item.price}</span>
-	</RemoveToggler>
-}
-
-const PriceList = () => {
-	const st = price.list.useStatus()
-
-	const items = price.list.items.sort((it1, it2) =>
-		it1.regionId > it2.regionId ? 1 : -1
-	)
-
-
-	const show = {}
-
-	const region = (id: number) =>
-		!show[id] && (
-			show[id] = true, <b>{regionMap[id]}</b>
-		)
-
-
-	return !st ? <div className={sty.loading}>загрузка</div> : <div className={sty.prices}>
-		{
-			items.map(it => <>
-				{region(it.regionId)}
-				<PriceItem key={it.id} item={it} />
-			</>)
-		}
-	</div>
-}
-
-const Toggler = (p: { num, title }) => <>
+const TabButton = (p: { num, title }) => <>
 	<input type='radio' id={'toggler' + p.num} name='toggler' />
 	<label htmlFor={'toggler' + p.num}>{p.title}</label>
 </>
@@ -106,21 +68,21 @@ const Home: NextPage<Props> = p => {
 			<div className={sty.tabs}>
 				{
 					['Регионы', 'Продукты', 'Цены'].map((it, i) =>
-						<Toggler key={i} num={i} title={it} />
+						<TabButton key={i} num={i} title={it} />
 					)
 				}
 
-				<div id='tab1'>
+				<div>
 					<List store={region} />
 					<hr />
 					<NewRegion />
 				</div>
-				<div id='tab2'>
+				<div>
 					<List store={product} />
 					<hr />
 					<NewProduct />
 				</div>
-				<div id='tab3'>
+				<div>
 					<PriceList />
 					<hr />
 					<NewPrice />

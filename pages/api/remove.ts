@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from 'next'
-import {Prisma, PrismaClient} from '@prisma/client'
-import {randomInt} from "crypto";
+import {PrismaClient} from '@prisma/client'
+import {randomInt} from 'crypto'
 
 const prisma = new PrismaClient()
 
@@ -22,10 +22,8 @@ export default async function handler(
 	const tryRemove = randomInt(0, 100) > 50
 
 	try {
-		const prisma = new PrismaClient()
-
 		await (
-			new Promise((res) => setTimeout(() => {res(true)}, 5000))
+			new Promise((res) => setTimeout(() => {res(true)}, 4000))
 		)
 
 		if (tryRemove) {

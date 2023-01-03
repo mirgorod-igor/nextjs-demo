@@ -14,13 +14,11 @@ const Item = <T extends Id,>(p: T & { store: store.Remove }) => {
 const List = <T extends Id,>(p: {
 	store: store.Compose<T>
 }) => {
-	const wait = p.store.list.useStatus() == 'wait'
+	const st = p.store.list.useStatus()
 
-	return <div className={wait ? sty.loading : sty.list}>
+	return (!st || st == 'wait') ? <div className={sty.loading} /> : <div className={sty.list}>
 		{
-			wait
-				? 'загрузка'
-				: p.store.list.items.map((it, i) => <Item key={i} store={p.store.remove} {...it} />)
+			p.store.list.items.map((it, i) => <Item key={i} store={p.store.remove} {...it} />)
 		}
 	</div>
 }
