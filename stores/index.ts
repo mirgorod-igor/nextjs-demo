@@ -6,50 +6,57 @@ import List from './List'
 
 export { EditItem, RemoveItem, List }
 
+const compose = <T,>(type: ModelType) => ({
+	edit: new EditItem<T>(type),
+	list: new List<T>(type),
+	remove: new RemoveItem(type),
+} as store.Compose<T>)
 
 export const
-	regionItem = new EditItem<Region>('region'),
-	productItem = new EditItem<Product>('product'),
-	priceItem = new EditItem<Price>('price'),
-
-	removeRegion = new RemoveItem('region'),
-	removeProduct = new RemoveItem('product'),
-	removePrice = new RemoveItem('price'),
-	
-	regionList = new List<Region>('region'),
-	productList = new List<Product>('product'),
-	priceList = new List<Price>('price'),
-
+	region = compose<Region>('region'),
+	product = compose<Product>('product'),
+	price = compose<Price>('price'),
 
 	regionMap: Record<number, string> = {},
 	productMap: Record<number, string> = {}
 
 
-removeRegion.onStatus(st => {
+for (const store of [region, product, price])
+	store.edit.onStatus(st => {
+		if (st == 'ok') {
+			store.list.fetch()
+		}
+	})
+
+
+
+region.remove.onStatus(st => {
 	if (st == 'ok') {
-		regionList.fetch()
-		priceList.fetch()
+		region.list.fetch()
+		price.list.fetch()
 	}
 })
 
-removeProduct.onStatus(st => {
+
+product.remove.onStatus(st => {
 	if (st == 'ok') {
-		productList.fetch()
-		priceList.fetch()
+		product.list.fetch()
+		price.list.fetch()
 	}
 })
 
-removePrice.onStatus(st => {
+
+price.remove.onStatus(st => {
 	if (st == 'ok')
-		priceList.fetch()
+		price.list.fetch()
 })
 
 
 
-regionList.onStatus(v => {
-	regionList.items.map(it => regionMap[it.id] = it.name)
+region.list.onStatus(v => {
+	region.list.items.map(it => regionMap[it.id] = it.name)
 })
 
-productList.onStatus(v => {
-	productList.items.map(it => productMap[it.id] = it.name)
+product.list.onStatus(v => {
+	product.list.items.map(it => productMap[it.id] = it.name)
 })

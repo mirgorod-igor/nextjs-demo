@@ -1,10 +1,9 @@
 import {ReactNode} from 'react'
-import {RemoveItem} from '../stores'
 
 
 type Props = {
     id
-    store: RemoveItem
+    store: store.Remove
     children: ReactNode
 }
 

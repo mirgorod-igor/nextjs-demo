@@ -1,6 +1,4 @@
-import {EditItem, List} from '../stores'
-
-const Options = (p: { store: List<any> }) => {
+const Options = (p: { store: store.List<any> }) => {
 	p.store.useStatus()
 
 	return <>
@@ -14,17 +12,18 @@ const Options = (p: { store: List<any> }) => {
 }
 
 type Props<T> = {
-	store: [EditItem<T>, List<any>]
+	edit: store.Edit<T>
+	list: store.List<any>
 	fieldName: keyof T
 }
 
 const Select = <T,>(p: Props<T>) => {
-	const wait = p.store[0].useStatus() == 'wait'
+	const wait = p.edit.useStatus() == 'wait'
 
 	return <select disabled={wait} onChange={e =>
-		p.store[0].value[p.fieldName] = parseInt(e.target.value) as T[keyof T]
+		p.edit.value[p.fieldName] = parseInt(e.target.value) as T[keyof T]
 	}>
-		<Options store={p.store[1]} />
+		<Options store={p.list} />
 	</select>
 }
 

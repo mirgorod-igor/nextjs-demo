@@ -1,12 +1,10 @@
-import * as store from '../stores'
-
 import {RemoveToggler} from '.'
-
 
 import sty from '../styles/list.module.sass'
 
 
-const Item = <T extends Id,>(p: T & { store: store.RemoveItem }) => {
+
+const Item = <T extends Id,>(p: T & { store: store.Remove }) => {
 
 	return <RemoveToggler id={p.id} store={p.store}>
 		<span>{p['name']}</span>
@@ -14,13 +12,15 @@ const Item = <T extends Id,>(p: T & { store: store.RemoveItem }) => {
 }
 
 const List = <T extends Id,>(p: {
-	store: [store.List<T>, store.RemoveItem]
+	store: store.Compose<T>
 }) => {
-	const status = p.store[0].useStatus()
-	
-	return !status ? <div className={sty.loading}>загрузка</div> : <div className={sty.list}>
+	const wait = p.store.list.useStatus() == 'wait'
+
+	return <div className={wait ? sty.loading : sty.list}>
 		{
-			p.store[0].items.map((it, i) => <Item key={i} store={p.store[1]} {...it} />)
+			wait
+				? 'загрузка'
+				: p.store.list.items.map((it, i) => <Item key={i} store={p.store.remove} {...it} />)
 		}
 	</div>
 }

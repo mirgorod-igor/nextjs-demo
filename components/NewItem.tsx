@@ -1,24 +1,17 @@
 import {ReactNode} from 'react'
-import {EditItem, List, priceList} from '../stores'
+import {price} from '../stores'
 
 import sty from '../styles/home.module.sass'
 
 
-const submit = (item: EditItem, list: List<any>) => {
-	item.submit().then(async st => {
-		if (st == 'ok') {
-			await list.fetch()
-			await priceList.forceRefresh()
-		}
-	})
-}
 
 
-const ToggleNew = (p: { id: string, item: EditItem }) => {
+
+const ToggleNew = (p: { id: string, edit: store.Edit<any> }) => {
 	return <span className={sty.toggleNew}>
 		<input
 			type='checkbox' id={p.id}
-			onClick={e => p.item.opened = e.currentTarget.checked}/>
+			onClick={e => p.edit.opened = e.currentTarget.checked}/>
 		<label htmlFor={p.id}> новая</label>
 	</span>
 }
@@ -28,16 +21,16 @@ const ToggleNew = (p: { id: string, item: EditItem }) => {
 const NewItem = (p: {
 	name: string
 	children: ReactNode
-	store: [EditItem, List<any>]
+	store: store.Edit<any>
 }) => {
-	const opened = p.store[0].useOpened()
+	const opened = p.store.useOpened()
 	return opened
 		? <div className={sty.newItem}>
 			{p.children}
-			<span onClick={_ => submit(p.store[0], p.store[1])} />
-			<span onClick={_ => p.store[0].cancel()} />
+			<span onClick={_ => p.store.submit()} />
+			<span onClick={_ => p.store.cancel()} />
 		</div>
-		: <ToggleNew id={'toggler_new_' + p.name} item={p.store[0]} />
+		: <ToggleNew id={'toggler_new_' + p.name} edit={p.store} />
 }
 
 

@@ -1,9 +1,9 @@
 import Api from './Api'
 import {atom, WritableAtom} from 'nanostores'
-import {useStore} from "@nanostores/react";
+import {useStore} from "@nanostores/react"
 
 
-class RemoveItem extends Api {
+class RemoveItem extends Api implements store.Remove {
     private readonly type: ModelType
     id: Record<number, WritableAtom<boolean>> = {}
 

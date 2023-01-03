@@ -1,28 +1,19 @@
 import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
+import Api from './Api'
 
-class EditItem<T = any> {
+class EditItem<T = any> extends Api implements store.Edit<T> {
 	private _value: T
 	private _opened = atom(false)
-
-	private _status = atom<api.Status|'wait'|undefined>(undefined)
-	private get status() {
-		return this._status.get()
-	}
-	private set status(v) {
-		this._status.set(v)
-	}
 
 	private _type = ''
 	
 	constructor(type: string) {
+		super()
 		this._type = type
 		this._value = {} as T
 	}
 
-	useStatus() {
-		return useStore(this._status)
-	}
 	get value() {
 		return this._value
 	}
@@ -38,31 +29,14 @@ class EditItem<T = any> {
 	}
 	
 	async submit() {
-		this.status = 'wait'
-		try {
-			const res = await fetch('/api/save', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					type: this._type, item: this.value
-				})
-			})
-			if (res.ok) {
-				const s = await res.json()
-				this.status = s.status
-				this.opened = false
-			}
-			else {
-				this.status = 'error'
-			}
-		}
-		catch (e) {
-			this.status = 'net'
-		}
+		const res = await this.call('/api/save', {
+			type: this._type, item: this.value
+		})
+
+		if (res)
+			this.opened = false
 		
-		return this.status
+		return this.status!
 	}
 	
 	cancel() {
