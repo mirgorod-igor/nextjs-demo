@@ -13,10 +13,12 @@ type ModelType = 'region' | 'product' | 'price' | 'org'
 module store {
 	type PageNum = number | 'l' | 'r'
 
+	type StatusListener = (st: api.Status) => void
+
 	interface Api {
-		readonly status: api.Status|undefined
-		useStatus(): api.Status|undefined
-		listenStatus(listener: (st: api.Status|undefined) => void)
+		readonly status: api.Status
+		useStatus(): api.Status
+		listen(listener: StatusListener)
 	}
 
 	interface Edit<T> extends Api {
@@ -27,29 +29,31 @@ module store {
 		value: T
 	}
 
+
 	type ItemsListener<T> = ((items: T[]) => void)
 	interface List<T> extends Api {
 		items: T[]
 		fetch(): Promise<boolean>
 		listenItems(listener: ItemsListener<T>)
+		remove(id: number): store.Remove
+		listenRemove(listener: StatusListener)
 	}
 	interface PagedList<T> extends List<T> {
 		readonly page: store.PageNum
 		gotoPage(num: store.PageNum)
 		pages: store.PageNum[]
 		fetchBegin(): Promise<void>
-		fetchPage(): Promise<boolean>
 	}
 
 	interface Remove extends Api {
-		useId(id): boolean
-		remove(id): Promise<boolean>
+		readonly type: string
+		//new (type: ModelType, id: number): Remove
+		remove(): Promise<boolean>
 	}
 
 	interface Compose<T> {
 		edit: Edit<T>
 		list: PagedList<T>
-		remove: Remove
 	}
 
 }

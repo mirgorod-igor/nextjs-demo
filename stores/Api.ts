@@ -2,7 +2,7 @@ import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
 class Api implements store.Api {
-    protected _status = atom<api.Status|undefined>()
+    protected _status = atom<api.Status>('ok')
     get status() {
         return this._status.get()
     }
@@ -15,6 +15,9 @@ class Api implements store.Api {
     }
 
     protected async call(url: string, body?: any, method = 'POST'): Promise<boolean> {
+        if (this.status == 'wait')
+            return false
+
         this.status = 'wait'
         let res = false
         const modify = method && body
@@ -44,7 +47,7 @@ class Api implements store.Api {
         return res
     }
 
-    listenStatus(listener: (st: api.Status|undefined) => void) {
+    listen(listener: store.StatusListener) {
         this._status.listen(listener)
     }
 

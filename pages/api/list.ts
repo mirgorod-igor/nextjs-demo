@@ -1,10 +1,11 @@
-
 import {NextApiRequest, NextApiResponse} from 'next'
 import {Prisma, PrismaClient} from '@prisma/client'
 
+import prisma from 'lib/prisma'
+
 import 'lib/ext'
 
-const prisma = new PrismaClient()
+
 
 type OrderBy = Prisma.RegionOrderByWithRelationInput | Prisma.OrgOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput | Prisma.PriceOrderByWithRelationInput
 

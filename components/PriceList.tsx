@@ -1,45 +1,29 @@
 import {Fragment} from 'react'
-import {Price} from '@prisma/client'
 
-import {RemoveToggler} from '.'
+import {List} from '.'
 
 import {price, productMap, regionMap} from 'stores'
 
-import sty from 'styles/home.module.sass'
+import sty from 'styles/list.module.sass'
 
 
-const Item = (p: { item: Price }) => {
-
-    return <RemoveToggler id={p.item.id} store={price.remove}>
-        <span>{productMap[p.item.productId]}</span>
-        <span>{p.item.price}</span>
-    </RemoveToggler>
-}
 
 const PriceList = () => {
-    const st = price.list.useStatus()
 
-    const items = price.list.items.sort((it1, it2) =>
-        it1.regionId > it2.regionId ? 1 : -1
-    )
+    const region = (id: number) => <b>{regionMap[id]}</b>
 
-
-    const show = {}
-
-    const region = (id: number) =>
-        !show[id] && (
-            show[id] = true, <b>{regionMap[id]}</b>
-        )
-
-
-    return (!st || st == 'wait') ? <div className={sty.loading} /> : <div className={sty.prices}>
+    return <List
+        className={sty.prices} store={price.list}
+        compareFn={(it1, it2) => it1.regionId > it2.regionId ? 1 : -1}
+        group={['regionId', region]}
+    >
         {
-            items.map(it => <Fragment key={it.id}>
-                {region(it.regionId)}
-                <Item item={it} />
-            </Fragment>)
+            it => <Fragment key={it.id}>
+                <span>{productMap[it.productId]}</span>
+                <span>{it.price}</span>
+            </Fragment>
         }
-    </div>
+    </List>
 }
 
 

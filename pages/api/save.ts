@@ -1,10 +1,9 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type {NextApiRequest, NextApiResponse} from 'next'
-import {Prisma, PrismaClient} from '@prisma/client'
+import {Prisma} from '@prisma/client'
+
+import prisma from 'lib/prisma'
 
 
-
-const prisma = new PrismaClient()
 
 type Body = {
 	type: ModelType

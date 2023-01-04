@@ -1,8 +1,10 @@
 import {NextApiRequest, NextApiResponse} from 'next'
-import {PrismaClient} from '@prisma/client'
+
 import {randomInt} from 'crypto'
 
-const prisma = new PrismaClient()
+import prisma from 'lib/prisma'
+
+
 
 
 type Body = {
@@ -27,6 +29,7 @@ export default async function handler(
 		)
 
 		if (tryRemove) {
+		//if (false) {
 			// @ts-ignore
 			await prisma[body.type].delete({ where: { id: body.id } })
 			res.json({status: 'ok'})

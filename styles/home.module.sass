@@ -1,62 +1,15 @@
-@use 'icons'
-
+@use 'icon'
 
 .main
 	display: flex
 	flex-direction: column
-	justify-content: space-between
-	align-items: center
+	align-items: stretch
 	padding: 6rem
 
-.loading
-	padding: 30px
-	background: url(/svg/loading.svg) center center no-repeat
-	margin: 30px
-
-.prices
-	display: grid
-	grid-template-columns: repeat(3, 1fr)
-	column-gap: 12px
-	row-gap: 8px
-	padding: 16px 12px
 
 
-	b
-		grid-column: span 3
-		&:not(:first-of-type)
-			border-top: 1px solid #CCCCCC
-			padding-top: 4px
-	label
-		@extend .remove
-		justify-self: end
 
-	input[type=radio]
-		display: none
-
-		&:checked
-			& + span
-				color: lightgray
-				& + span
-					color: lightgray
-					& + label
-						@extend .wait
-
-		&:global(.wait) + span + span + label
-			background: url(/svg/loading.svg)
-
-		&:global(.error) + span
-			color: red
-			& + span
-				color: red
-
-.orgs
-	@extend .prices
-	grid-template-columns: repeat(4, 1fr)
-	b
-		grid-column: span 4
-
-
-.toggleNew
+.newToggler
 	display: block
 	label, input
 		display: none
@@ -84,18 +37,28 @@
 		&:hover:before
 			background: cornflowerblue
 
-		
+
 		
 .newItem
 	position: relative
 	display: flex
 	column-gap: 8px
+
 	span
 		cursor: pointer
-		&:first-of-type
-			@extend .check
 		&:last-of-type
-			@extend .cancel
+			display: none
+
+	:global(._T_)
+		&:checked
+			~ span:first-of-type
+				display: none
+				+ span
+					display: none
+					+ span
+						display: inline-block
+
+
 
 	
 .tabs
@@ -115,6 +78,7 @@
 		
 		& ~ div
 			display: none
+			grid-column: span 4
 		
 		& + label
 			padding: 8px 16px
@@ -126,7 +90,6 @@
 			&:hover
 				background: aliceblue
 
-			
 		
 		&:checked
 			+ label

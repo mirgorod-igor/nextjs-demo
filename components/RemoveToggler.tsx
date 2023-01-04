@@ -1,15 +1,6 @@
 import {ReactNode} from 'react'
+import Toggler from './Toggler'
 
-
-const Radio = (p: Props & { name }) => {
-    p.store.useId(p.id)
-    const st = p.store.status
-
-    return <input
-        type='radio' id={p.name + '-' + p.id} className={st} checked={st == 'wait'}
-        onChange={_ => p.store.remove(p.id)}
-    />
-}
 
 
 type Props = {
@@ -19,12 +10,12 @@ type Props = {
 }
 
 const RemoveToggler = (p: Props) => {
-
-    return <>
-        <Radio name='remove' {...p} />
+    const name = 'remove-' + p.store.type
+    return <div>
+        <Toggler id={p.id} store={p.store} name={name} onChange={_ => p.store.remove()} />
         {p.children}
-        <label htmlFor={'remove-' + p.id}>&ndash;</label>
-    </>
+        <label htmlFor={name + '-' + p.id}>&ndash;</label>
+    </div>
 }
 
 export default RemoveToggler

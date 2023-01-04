@@ -1,37 +1,18 @@
-import {atom, WritableAtom} from 'nanostores'
-import {useStore} from '@nanostores/react'
-
 import Api from './Api'
 
 
 class RemoveItem extends Api implements store.Remove {
-    private readonly type: ModelType
-    id: Record<number, WritableAtom<boolean>> = {}
-
-    constructor(type: ModelType) {
+    constructor(
+        readonly type: ModelType,
+        private id: number
+    ) {
         super()
-        this.type = type
     }
 
-    async remove(id: number) {
-        if (this.id[id].get())
-            return false
-
-        this.id[id].set(true)
-
-        const res = await this.call(
-            '/api/remove', { id, type: this.type }, 'DELETE'
+    async remove() {
+        return await this.call(
+            '/api/remove', { id: this.id, type: this.type }, 'DELETE'
         )
-
-        this.id[id].set(false)
-
-        return res
-    }
-
-    useId(id) {
-        if (!this.id[id])
-            this.id[id] = atom(false)
-        return useStore(this.id[id])
     }
 }
 

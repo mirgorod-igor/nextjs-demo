@@ -1,30 +1,16 @@
 import {Fragment} from 'react'
-import {Org} from '@prisma/client'
 
-import {RemoveToggler} from '.'
+import {List} from '.'
 
 import {org, tradeMap, regionMap} from 'stores'
 
 
-import sty from 'styles/home.module.sass'
+import sty from 'styles/list.module.sass'
 
 
-const Item = (p: { item: Org }) => {
 
-    return <RemoveToggler id={p.item.id} store={org.remove}>
-        <span>{p.item.name}</span>
-        <span>{p.item.legalAddr}</span>
-        <span>{tradeMap[p.item.trade]}</span>
-    </RemoveToggler>
-}
 
 const OrgList = () => {
-    const st = org.list.useStatus()
-
-    const items = org.list.items.sort((it1, it2) =>
-        it1.regionId > it2.regionId ? 1 : -1
-    )
-
     const show = {}
 
     const region = (id: number) =>
@@ -33,14 +19,16 @@ const OrgList = () => {
         )
 
 
-    return (!st || st == 'wait') ? <div className={sty.loading} /> : <div className={sty.orgs}>
+    return <List className={sty.orgs} store={org.list} compareFn={(it1, it2) => it1.regionId > it2.regionId ? 1 : -1}>
         {
-            items.map(it => <Fragment key={it.id}>
+            it => <Fragment key={it.id}>
                 {region(it.regionId)}
-                <Item item={it} />
-            </Fragment>)
+                <span>{it.name}</span>
+                <span>{it.legalAddr}</span>
+                <span>{tradeMap[it.trade]}</span>
+            </Fragment>
         }
-    </div>
+    </List>
 }
 
 

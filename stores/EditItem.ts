@@ -5,12 +5,11 @@ import Api from './Api'
 class EditItem<T = any> extends Api implements store.Edit<T> {
 	private _value: T
 	private _opened = atom(false)
-
-	private _type = ''
 	
-	constructor(type: string) {
+	constructor(
+		private readonly type: string
+	) {
 		super()
-		this._type = type
 		this._value = {} as T
 	}
 
@@ -30,7 +29,7 @@ class EditItem<T = any> extends Api implements store.Edit<T> {
 	
 	async submit() {
 		const res = await this.call('/api/save', {
-			type: this._type, item: this.value
+			type: this.type, item: this.value
 		})
 
 		if (res)

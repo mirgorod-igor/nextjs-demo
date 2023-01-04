@@ -2,7 +2,9 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as csv from 'fast-csv'
 
-import {PrismaClient, Prisma, Region, Product} from '@prisma/client'
+import {Prisma, Region} from '@prisma/client'
+
+import prisma from 'lib/prisma'
 
 
 const regions: Prisma.RegionCreateManyInput[] = [
@@ -48,7 +50,6 @@ const readRegions = (resolve: (value: Region[]) => void) =>
 
 const main = async () => {
 	const regions = await (new Promise<Region[]>(readRegions))
-	const prisma = new PrismaClient()
 
 	try {
 		await prisma.region.createMany({

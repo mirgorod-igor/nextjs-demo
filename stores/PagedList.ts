@@ -35,7 +35,7 @@ class PagedList<T> extends List<T> implements store.PagedList<T> {
 
 	constructor(type: ModelType) {
 		super(type)
-		this._page.listen(this.fetchPage.bind(this))
+		this._page.listen(this.fetch.bind(this))
 	}
 
 	protected override onJson(data: api.PagedList<T>) {
@@ -54,8 +54,8 @@ class PagedList<T> extends List<T> implements store.PagedList<T> {
 		this._page.set(next)
 	}
 
-	async fetchPage() {
-		return await this.call(`${this.url}&page_num=${this.page}&page_size=${PAGE_SIZE}`)
+	protected override get url() {
+		return `${super.url}&page_num=${this.page}&page_size=${PAGE_SIZE}`
 	}
 
 	async fetchBegin() {
