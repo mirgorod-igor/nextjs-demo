@@ -2,8 +2,6 @@ import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
 
-import {type Trade} from '@prisma/client'
-
 import {NewItem, Input, Select, List, PriceList, OrgList} from 'components'
 
 import {region, product, price, org, fetchData, regionList} from 'stores'
@@ -42,7 +40,6 @@ const NewOrg = () =>
 			<option value='w' defaultChecked>опт</option>
 			<option value='r'>роз</option>
 		</Select>
-
 	</NewItem>
 
 
