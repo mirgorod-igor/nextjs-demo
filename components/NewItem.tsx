@@ -12,7 +12,7 @@ const NewToggler = (p: { id: string, edit: store.Edit<any> }) => {
 		<input
 			type='radio' id={p.id} className='_T_'
 			onClick={e => p.edit.opened = e.currentTarget.checked}/>
-		<label htmlFor={p.id}> новая</label>
+		<label htmlFor={p.id}> добавить</label>
 	</span>
 }
 

@@ -1,33 +1,39 @@
 .paging
-  list-style: none
-  display: flex
-  column-gap: 8px
-  font-size: 1rem
-  margin-bottom: 8px
-
-  > li
+    list-style: none
     display: flex
-    align-items: center
-    justify-content: center
-    border-radius: 99px
-    color: lightblue
-    width: 36px
-    height: 36px
-    margin: 0
-    line-height: 2
-    cursor: pointer
-    user-select: none
+    column-gap: 8px
+    font-size: 1rem
+    margin-bottom: 8px
 
-    &.dots
-      font-weight: bolder
-      background: white
+    > li
+        display: flex
+        align-items: center
+        justify-content: center
+        border-radius: 99px
+        color: lightblue
+        width: 36px
+        height: 36px
+        margin: 0
+        line-height: 2
+        cursor: pointer
+        user-select: none
 
-      svg
-        fill: lightblue
-    //&.flip
-        svg
-            transform: rotate(180deg)
-    &.active
-      background: dodgerblue
-      color: white
-      cursor: default
+        transition: background 0.3s linear
+
+        &.dots
+            font-weight: bolder
+            background: white
+
+            svg
+                fill: lightblue
+        //&.flip
+            svg
+                transform: rotate(180deg)
+
+        &:hover
+            background: aliceblue
+
+        &.active
+            background: dodgerblue
+            color: white
+            cursor: default

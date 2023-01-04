@@ -33,7 +33,7 @@ class EditItem<T = any> extends Api implements store.Edit<T> {
 		})
 
 		if (res)
-			this.opened = false
+			this.cancel()
 		
 		return this.status!
 	}

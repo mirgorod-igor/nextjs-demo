@@ -2,16 +2,20 @@ import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
 
+import {type Trade} from '@prisma/client'
+
 import {NewItem, Input, Select, List, PriceList, OrgList} from 'components'
 
 import {region, product, price, org, fetchData, regionList} from 'stores'
 
+
 import sty from 'styles/home.module.sass'
 
 
+
 const changeHandlerFactory = <T,>(store: store.Edit<T>, fieldName: keyof T, asNumber?: boolean) =>
-	e =>
-		store.value[fieldName] = (asNumber ? e.target.valueAsNumber : e.target.value) as T[keyof T]
+	e => store.value[fieldName] = (asNumber ? parseInt(e.target.value) : e.target.value) as T[keyof T]
+
 
 
 const NewRegion = () =>
@@ -28,17 +32,17 @@ const NewOrg = () =>
 	<NewItem name='org' store={org.edit}>
 		<Input placeholder='название' edit={org.edit}
 		       onChange={changeHandlerFactory(org.edit, 'name')} />
-		<Select edit={org.edit} list={regionList} fieldName='regionId' />
+		<Select edit={org.edit} list={regionList}
+		        onChange={changeHandlerFactory(org.edit, 'regionId', true)} />
 		<Input placeholder='юр. адрес' edit={org.edit}
 		       onChange={changeHandlerFactory(org.edit, 'legalAddr')} />
-		<label>
-			опт
-			<input defaultChecked type='radio' name='trade' value='w' />
-		</label>
-		<label>
-			роз
-			<input type='radio' name='trade' value='r' />
-		</label>
+		<Select edit={org.edit}
+		        onChange={changeHandlerFactory(org.edit, 'trade')}
+		>
+			<option value='w' defaultChecked>опт</option>
+			<option value='r'>роз</option>
+		</Select>
+
 	</NewItem>
 
 
@@ -53,9 +57,11 @@ const NewProduct = () =>
 
 const NewPrice = () => {
 	return <NewItem name='price' store={price.edit}>
-		<Select edit={price.edit} list={regionList} fieldName='regionId' />
-		<Select edit={price.edit} list={product.list} fieldName='productId' />
-		<Input placeholder='название' edit={price.edit}
+		<Select edit={price.edit} list={regionList}
+		        onChange={changeHandlerFactory(price.edit, 'regionId', true)} />
+		<Select edit={price.edit} list={product.list}
+		        onChange={changeHandlerFactory(price.edit, 'productId', true)} />
+		<Input placeholder='введите цену' edit={price.edit}
 		       onChange={changeHandlerFactory(price.edit, 'price', true)} asNumber />
 	</NewItem>
 }
@@ -69,7 +75,7 @@ type Props = {
 
 
 const TabButton = (p: { num, title }) => <>
-	<input type='radio' id={'toggler' + p.num} name='toggler' className='_T_' />
+	<input type='radio' defaultChecked={p.num == 0 || undefined} id={'toggler' + p.num} name='toggler' className='_T_' />
 	<label htmlFor={'toggler' + p.num}>{p.title}</label>
 </>
 

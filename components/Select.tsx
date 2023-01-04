@@ -1,3 +1,5 @@
+import {ChangeEventHandler, ReactNode} from 'react'
+
 const Options = (p: { store: store.List<any> }) => {
 	p.store.useStatus()
 
@@ -13,17 +15,16 @@ const Options = (p: { store: store.List<any> }) => {
 
 type Props<T> = {
 	edit: store.Edit<T>
-	list: store.List<any>
-	fieldName: keyof T
+	list?: store.List<any>
+	children?: ReactNode
+	onChange: ChangeEventHandler<HTMLSelectElement>
 }
 
 const Select = <T,>(p: Props<T>) => {
 	const wait = p.edit.useStatus() == 'wait'
 
-	return <select disabled={wait} onChange={e =>
-		p.edit.value[p.fieldName] = parseInt(e.target.value) as T[keyof T]
-	}>
-		<Options store={p.list} />
+	return <select disabled={wait} onChange={p.onChange}>
+		{ p.list ? <Options store={p.list} /> : p.children }
 	</select>
 }
 

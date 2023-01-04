@@ -47,11 +47,13 @@ class PagedList<T> extends List<T> implements store.PagedList<T> {
 	}
 
 	gotoPage(num: store.PageNum) {
-		const next = isNaN(num as number)
-			? this.pages[this.pages.indexOf(num) -1] as number + 1
-			: num as number
+		if (this.status != 'wait') {
+			const next = isNaN(num as number)
+				? this.pages[this.pages.indexOf(num) - 1] as number + 1
+				: num as number
 
-		this._page.set(next)
+			this._page.set(next)
+		}
 	}
 
 	protected override get url() {
