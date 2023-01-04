@@ -2,11 +2,11 @@ import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
 
-import {NewItem, Input, Select, List, PriceList, OrgList} from '../components'
+import {NewItem, Input, Select, List, PriceList, OrgList} from 'components'
 
-import {region, product, price, org} from '../stores'
+import {region, product, price, org, fetchData, regionList} from 'stores'
 
-import sty from '../styles/home.module.sass'
+import sty from 'styles/home.module.sass'
 
 
 
@@ -20,7 +20,7 @@ const NewRegion = () =>
 const NewOrg = () =>
 	<NewItem name='org' store={org.edit}>
 		<Input placeholder='название' edit={org.edit} fieldName='name' />
-		<Select edit={org.edit} list={region.list} fieldName='regionId' />
+		<Select edit={org.edit} list={regionList} fieldName='regionId' />
 		<Input placeholder='юр. адрес' edit={org.edit} fieldName='legalAddr' />
 		<label>
 			опт
@@ -43,7 +43,7 @@ const NewProduct = () =>
 
 const NewPrice = () => {
 	return <NewItem name='price' store={price.edit}>
-		<Select edit={price.edit} list={region.list} fieldName='regionId' />
+		<Select edit={price.edit} list={regionList} fieldName='regionId' />
 		<Select edit={price.edit} list={product.list} fieldName='productId' />
 		<Input placeholder='название' edit={price.edit} fieldName='price' asNumber />
 	</NewItem>
@@ -64,13 +64,7 @@ const TabButton = (p: { num, title }) => <>
 
 const Home: NextPage<Props> = p => {
 	useEffect(() => {
-		Promise.all([
-			region.list.fetch(),
-			product.list.fetch()
-		]).then(() => {
-			org.list.fetch()
-			price.list.fetch()
-		})
+		fetchData()
 	}, [])
 
 	return <>

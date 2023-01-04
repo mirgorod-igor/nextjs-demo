@@ -1,6 +1,8 @@
+
 import {NextApiRequest, NextApiResponse} from 'next'
 import {Prisma, PrismaClient} from '@prisma/client'
 
+import 'lib/ext'
 
 const prisma = new PrismaClient()
 
@@ -23,23 +25,39 @@ const orderBy: Record<ModelType, OrderBy> = {
 	}
 }
 
+type Query = {
+	page_num?: string
+	page_size?: string
+	type: ModelType
+}
+
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse<api.PagedList<any>>
 ) {
-	const type = req.query.type as ModelType
+	const q = req.query as Query
+	/*prisma.org.findMany({
+		skip: (q.page_num.int * q.page_size.int),
+		take: q.page_size.int
+	})*/
+
+	const [skip, take] = q.page_num && q.page_size ? [q.page_num.int * q.page_size.int, q.page_size.int] : []
+
 	// @ts-ignore
-	const items = await prisma[type].findMany({
-		orderBy: orderBy[type]
+	const items = await prisma[q.type].findMany({
+		skip, take,
+		orderBy: orderBy[q.type]
 	})
 
+	// @ts-ignore
+	const total = await prisma[q.type].count()
+
 	await (
-		new Promise((res) => setTimeout(() => {res(true)}, 4000))
+		new Promise((res) => setTimeout(() => {res(true)}, 3000))
 	)
 
 	res.json({
-		items,
-		total: 100
+		items, total
 	})
 	
 }

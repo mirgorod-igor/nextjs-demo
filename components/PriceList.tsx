@@ -1,8 +1,11 @@
+import {Fragment} from 'react'
 import {Price} from '@prisma/client'
-import {RemoveToggler} from '.'
-import {price, productMap, regionMap} from '../stores'
 
-import sty from '../styles/home.module.sass'
+import {RemoveToggler} from '.'
+
+import {price, productMap, regionMap} from 'stores'
+
+import sty from 'styles/home.module.sass'
 
 
 const Item = (p: { item: Price }) => {
@@ -31,10 +34,10 @@ const PriceList = () => {
 
     return (!st || st == 'wait') ? <div className={sty.loading} /> : <div className={sty.prices}>
         {
-            items.map(it => <>
+            items.map(it => <Fragment key={it.id}>
                 {region(it.regionId)}
-                <Item key={it.id} item={it} />
-            </>)
+                <Item item={it} />
+            </Fragment>)
         }
     </div>
 }

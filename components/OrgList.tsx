@@ -1,8 +1,12 @@
+import {Fragment} from 'react'
 import {Org} from '@prisma/client'
-import {RemoveToggler} from '.'
-import {org, tradeMap, regionMap} from '../stores'
 
-import sty from '../styles/home.module.sass'
+import {RemoveToggler} from '.'
+
+import {org, tradeMap, regionMap} from 'stores'
+
+
+import sty from 'styles/home.module.sass'
 
 
 const Item = (p: { item: Org }) => {
@@ -31,10 +35,10 @@ const OrgList = () => {
 
     return (!st || st == 'wait') ? <div className={sty.loading} /> : <div className={sty.orgs}>
         {
-            items.map(it => <>
+            items.map(it => <Fragment key={it.id}>
                 {region(it.regionId)}
-                <Item key={it.id} item={it} />
-            </>)
+                <Item item={it} />
+            </Fragment>)
         }
     </div>
 }

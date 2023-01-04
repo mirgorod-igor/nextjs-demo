@@ -1,6 +1,8 @@
 import {RemoveToggler} from '.'
 
-import sty from '../styles/list.module.sass'
+import More from 'svg/more.svg'
+
+import sty from 'styles/list.module.sass'
 
 
 
@@ -15,12 +17,29 @@ const List = <T extends Id,>(p: {
 	store: store.Compose<T>
 }) => {
 	const st = p.store.list.useStatus()
+	const wait = !st || st == 'wait'
+	let dots = false
 
-	return (!st || st == 'wait') ? <div className={sty.loading} /> : <div className={sty.list}>
+	return <>
+		<div className={sty.list + (wait ? ' '+sty.loading : '')}>
+			{
+				p.store.list.items.map((it, i) =>
+					<Item key={i} store={p.store.remove} {...it} />
+				)
+			}
+		</div>
+		<ul className='paging'>
 		{
-			p.store.list.items.map((it, i) => <Item key={i} store={p.store.remove} {...it} />)
+			p.store.list.pages.map(it => (
+				dots = isNaN(it as number),
+				<li
+					className={`${dots?'dots':''} ${p.store.list.page == it?'active':''}`.trim() || undefined}
+					onClick={_ => p.store.list.gotoPage(it)}
+				>{isNaN(it as number) ? <More /> : it as number + 1}</li>
+			))
 		}
-	</div>
+		</ul>
+	</>
 }
 
 

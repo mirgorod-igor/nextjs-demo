@@ -1,9 +1,8 @@
 import Api from './Api'
 
-
-
 class List<T> extends Api implements store.List<T> {
 	private readonly type: ModelType
+
 	private _items: T[] = []
 	private _itemsListeners: store.ItemsListener<T>[] = []
 
@@ -14,6 +13,7 @@ class List<T> extends Api implements store.List<T> {
 
 	protected override onJson(data: api.PagedList<T>) {
 		this._items = data.items
+
 		for (const l of this._itemsListeners)
 			l(this._items)
 	}
@@ -22,11 +22,13 @@ class List<T> extends Api implements store.List<T> {
 		this._itemsListeners.push(listener)
 	}
 
-	async fetch() {
-		this._items = []
-		return await this.call('/api/list?type=' + this.type)
+	protected get url() {
+		return `/api/list?type=${this.type}`
 	}
-	
+	async fetch() {
+		return await this.call(this.url)
+	}
+
 	get items() {
 		return this._items
 	}

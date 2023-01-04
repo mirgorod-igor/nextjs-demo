@@ -11,6 +11,8 @@ type ModelType = 'region' | 'product' | 'price' | 'org'
 
 
 module store {
+	type PageNum = number | 'l' | 'r'
+
 	interface Api {
 		readonly status: api.Status|undefined
 		useStatus(): api.Status|undefined
@@ -31,6 +33,13 @@ module store {
 		fetch(): Promise<boolean>
 		listenItems(listener: ItemsListener<T>)
 	}
+	interface PagedList<T> extends List<T> {
+		readonly page: store.PageNum
+		gotoPage(num: store.PageNum)
+		pages: store.PageNum[]
+		fetchBegin(): Promise<void>
+		fetchPage(): Promise<boolean>
+	}
 
 	interface Remove extends Api {
 		useId(id): boolean
@@ -39,7 +48,7 @@ module store {
 
 	interface Compose<T> {
 		edit: Edit<T>
-		list: List<T>
+		list: PagedList<T>
 		remove: Remove
 	}
 
