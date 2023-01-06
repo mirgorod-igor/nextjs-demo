@@ -18,6 +18,14 @@ export default async function handler(
     const q = req.query as Query
 
     const data = await prisma.org.findUnique({
+        include: {
+            head: {
+                select: { id: true, name: true }
+            },
+            childs: {
+                select: { id: true, name: true }
+            }
+        },
         where: { id: q.id.int }
     })
 

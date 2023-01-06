@@ -33,6 +33,7 @@
     grid-template-rows: minmax(20px, auto)
     height: fit-content
 
+    font-size: 0.9rem
 
     > i
         font-style: normal
@@ -46,6 +47,14 @@
     &.wait
         &:after
             @extend .loading
+
+    > ul
+        list-style: none
+        display: flex
+        flex-flow: column
+        row-gap: 4px
+
+
 
 .details
     flex: 3

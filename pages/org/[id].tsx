@@ -1,6 +1,7 @@
 import {useEffect} from 'react'
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
+import Link from 'next/link'
 
 import {TreeList} from 'components'
 
@@ -11,14 +12,33 @@ import sty from 'styles/view.module.sass'
 
 
 
+
 const Card = () => {
     const st = view.useStatus()
+        , item = view.data
 
     return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
         <i>Наименоваие</i>
-        <span>{view.data.name}</span>
+        <span>{item.name}</span>
         <i>Юридический адрес</i>
-        <span>{view.data.legalAddr}</span>
+        <span>{item.legalAddr}</span>
+        {
+            item.head && <>
+                <i>Головная компания</i>
+                <Link href={`/org/`+item.head.id}>{item.head.name}</Link>
+            </>
+        }
+        {
+            item.childs?.length ? <>
+                <i>Дочерние компании</i>
+                <ul>
+                    {
+                        view.data.childs.map(it =>
+                            <Link key={it.id} href={`/org/`+it.id}>{it.name}</Link>)
+                    }
+                </ul>
+             </> : null
+        }
     </div>
 }
 

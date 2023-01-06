@@ -23,5 +23,5 @@ class ProductList extends PagedList<TreeItem<Product & { price: number }>> {
 }
 
 export const
-    view = new ViewItem<Org>('org'),
+    view = new ViewItem<TreeItem<Org & { head: IdName }>>('org'),
     products = new ProductList()

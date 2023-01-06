@@ -4,7 +4,7 @@ import {Inter} from '@next/font/google'
 
 import 'lib/ext'
 
-import '../styles/globals.sass'
+import 'styles/globals.sass'
 
 
 const inter = Inter({subsets: ['latin']})
