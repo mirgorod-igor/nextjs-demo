@@ -6,6 +6,21 @@ import prisma from 'lib/prisma'
 import 'lib/ext'
 
 
+type Include = Prisma.ProductInclude
+type Where = Prisma.ProductWhereInput
+
+const include: Partial<Record<ModelType, Include>> = {
+	product: {
+		childs: true
+	}
+}
+
+const where: Partial<Record<ModelType, Where>> = {
+	product: {
+		parentId: null
+	}
+}
+
 
 type OrderBy = Prisma.RegionOrderByWithRelationInput | Prisma.OrgOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput | Prisma.PriceOrderByWithRelationInput
 
@@ -44,11 +59,18 @@ export default async function handler(
 
 	const [skip, take] = q.page_num && q.page_size ? [q.page_num.int * q.page_size.int, q.page_size.int] : []
 
+
+
 	// @ts-ignore
 	const items = await prisma[q.type].findMany({
+		include: include[q.type],
+		where: where[q.type],
 		skip, take,
 		orderBy: orderBy[q.type]
 	})
+
+
+
 
 	// @ts-ignore
 	const total = await prisma[q.type].count()
@@ -56,6 +78,8 @@ export default async function handler(
 	await (
 		new Promise((res) => setTimeout(() => {res(true)}, 3000))
 	)
+
+	console.log(q.type, items)
 
 	res.json({
 		items, total

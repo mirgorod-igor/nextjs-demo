@@ -27,7 +27,7 @@ class List<T> extends Api implements store.List<T> {
 	}
 
 	protected get url() {
-		return `/api/list?type=${this.type}`
+		return `/api/${this.type}/list?`
 	}
 	async fetch() {
 		return await this.call(this.url)

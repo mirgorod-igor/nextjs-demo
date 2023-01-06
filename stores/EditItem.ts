@@ -4,7 +4,7 @@ import Api from './Api'
 
 class EditItem<T = any> extends Api implements store.Edit<T> {
 	private _value: T
-	private _opened = atom(false)
+	private _edited = atom(false)
 	
 	constructor(
 		private readonly type: string
@@ -20,11 +20,11 @@ class EditItem<T = any> extends Api implements store.Edit<T> {
 		this._value = v
 	}
 	
-	useOpened() {
-		return useStore(this._opened)
+	isEdited() {
+		return useStore(this._edited)
 	}
-	set opened(v: boolean) {
-		this._opened.set(v)
+	set edited(v: boolean) {
+		this._edited.set(v)
 	}
 	
 	async submit() {
@@ -40,7 +40,7 @@ class EditItem<T = any> extends Api implements store.Edit<T> {
 	
 	cancel() {
 		this.value = {} as T
-		this.opened = false
+		this.edited = false
 	}
 }
 

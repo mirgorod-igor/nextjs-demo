@@ -7,6 +7,11 @@ type IdName = Id & {
 }
 
 
+type TreeItem<T> = T & IdName & {
+	childs: Entity<T>[]
+	level?: number
+}
+
 type ModelType = 'region' | 'product' | 'price' | 'org'
 
 
@@ -22,8 +27,8 @@ module store {
 	}
 
 	interface Edit<T> extends Api {
-		opened: boolean
-		useOpened(): boolean
+		edited: boolean
+		isEdited(): boolean
 		submit(): Promise<api.Status>
 		cancel()
 		value: T

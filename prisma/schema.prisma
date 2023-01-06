@@ -18,39 +18,76 @@ model Region {
 }
 
 model Product {
-  id     Int     @id @default(autoincrement())
-  name   String
-  prices Price[]
+  id       Int     @id @default(autoincrement())
+  parentId Int?
+  name     String
+  prices   Price[]
+
+  parent Product?      @relation("ProductParent", fields: [parentId], references: [id], onDelete: Cascade)
+  childs Product[]     @relation("ProductParent")
+  attrs  ProductAttr[]
 
   @@map("products")
 }
 
+model ProductAttr {
+  id        Int    @id @default(autoincrement())
+  productId Int
+  parentId  Int?
+  name      String
+  value     String
+
+  product Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  parent  ProductAttr?  @relation("ProductAttrParent", fields: [parentId], references: [id], onDelete: Cascade)
+  childs  ProductAttr[] @relation("ProductAttrParent")
+
+  @@map("product_attrs")
+}
+
+model Society {
+  id    Int    @id @default(autoincrement())
+  name  String
+  short String
+  orgs  Org[]
+
+  @@map("societies")
+}
+
 model Org {
   id        Int    @id @default(autoincrement())
+  societyId Int
   name      String
+  short     String
   trade     Trade  @default(w)
   regionId  Int
   legalAddr String
+  headId    Int?
 
-  region Region @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  society Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
+  head    Org?    @relation("head", fields: [headId], references: [id])
+  childs  Org[]   @relation("head")
+  region  Region  @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  prices  Price[]
 
   @@map("orgs")
-}
-
-enum Trade {
-  w
-  r
 }
 
 model Price {
   id        Int   @id @default(autoincrement())
   productId Int
-  regionId  Int
+  regionId  Int?
+  orgId     Int?
   price     Float
 
+  org     Org?    @relation(fields: [orgId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  region  Region  @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  region  Region? @relation(fields: [regionId], references: [id], onDelete: Cascade)
 
-  @@unique([productId, regionId])
+  @@unique([productId, regionId, orgId])
   @@map("prices")
+}
+
+enum Trade {
+  w
+  r
 }

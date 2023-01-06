@@ -15,6 +15,15 @@ if (!String.prototype.hasOwnProperty('safeInt'))
         }
     })
 
+if (!Array.prototype.hasOwnProperty('groupBy'))
+    Array.prototype.groupBy = function<T, K = T[keyof T]>(keyName: keyof T) {
+        return this.reduce((r, it) =>
+            ((r[it[keyName]] || (r[it[keyName]] = [])).push(it), r),
+            // @ts-ignore
+            {} satisfies Record<K, T[]>
+        )
+    }
+
 /*
 export const defineProperties = (state: Atom<string[]>) => {
     Object.defineProperty(state, 'has', {

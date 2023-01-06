@@ -21,7 +21,8 @@
 .list
 	display: grid
 	grid-template-columns: 1fr
-	grid-template-rows: repeat(10, minmax(20px, 1fr))
+	grid-template-rows: repeat(10, minmax(20px, auto))
+	grid-auto-rows: fit-content(100%)
 	row-gap: 8px
 	padding: 16px 12px
 	width: 100%
@@ -30,10 +31,11 @@
 
 	> div
 		display: flex
-		justify-content: space-between
 		align-items: center
 		position: relative
-
+		column-gap: 8px
+		> *:not(:last-child)
+			flex: 1
 		// удаление
 		:global(._T_)
 			@extend .remove-toggler
@@ -56,27 +58,20 @@
 
 
 
-.prices
-	@extend .list
-
-	> div
-		> span
-			&:first-of-type
-				flex: 2
-			&:nth-of-type(2)
-				flex: 1
-
-
 
 .orgs
 	@extend .list
-
+	grid-template-columns: 0.5fr 10fr
+	> b
+		align-self: end
+		grid-column: span 2
 	> div
+		grid-column: 2
 		> span
 			&:first-of-type
-				flex: 1
-			&:nth-of-type(2)
 				flex: 2
+			&:nth-of-type(2)
+				flex: 4.5
 			&:nth-of-type(3)
 				flex: 0.5
 

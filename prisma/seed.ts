@@ -4,16 +4,60 @@ import * as csv from 'fast-csv'
 
 import {Prisma, Region} from '@prisma/client'
 
-import prisma from 'lib/prisma'
+import prisma from '../lib/prisma'
+
 
 
 const regions: Prisma.RegionCreateManyInput[] = [
 
 ]
 
-const products: Prisma.ProductCreateInput[] = [
+
+const societies: Prisma.SocietyCreateManyInput[] = [
+	{ name: 'Общество с ограниченной ответственностью', short: 'ООО' },
+	{ name: 'Акционерное общество', short: 'АО' },
+	{ name: 'Закрытое акционерное общество', short: 'ЗАО' },
+	{ name: 'Открытое акционерное общество', short: 'ОАО' },
+	{ name: 'Публичное акционерное общество', short: 'ПАО' }
+]
+
+const orgs: Prisma.OrgCreateManyInput[] = [
 	{
-		name: 'Стиральная машина'
+		societyId: 1,
+		name: 'Зерно-трейд',
+		short: 'Зерно-трейд',
+		regionId: 501165,
+		trade: 'w',
+		legalAddr: 'ул. Комсомольский Спуск, д.1, 4 этаж, комната 18'
+	},
+	{
+		societyId: 1,
+		name: 'Новороссийский Зерновой Терминал',
+		short: 'НЗТ CPT',
+		regionId: 542415,
+		headId: 1,
+		trade: 'w',
+		legalAddr: 'ул. Портовая, 14А'
+	},
+	{
+		societyId: 1,
+		name: 'Таганрогский судоремонтный завод CPT',
+		short: 'ТСРЗ CPT',
+		regionId: 501165,
+		headId: 1,
+		trade: 'w',
+		legalAddr: 'ул. Комсомольский Спуск, дом 1, 4 этаж, комната 27'
+	}
+]
+
+
+const uniProducts: Prisma.ProductCreateInput[] = [
+	{
+		name: 'Пшеница', childs: {
+			create: {
+				name: 'Протеин'
+			}
+		}
 	},
 	{
 		name: 'Зубная паста'
@@ -23,14 +67,24 @@ const products: Prisma.ProductCreateInput[] = [
 	}
 ]
 
-const orgs: Prisma.OrgCreateManyInput[] = [
-	{
-		name: 'ООО «Зерно-трейд»',
-		regionId: 501165,
-		trade: 'w',
-		legalAddr: 'ул. Комсомольский Спуск, д.1, 4 этаж, комната 18'
-	}
+
+
+const productsPrices: [string, number][] = [
+	['14.5', 14400],
+	['14', 14400],
+	['13.5', 14400],
+	['13', 14400],
+	['12.5', 14400],
+	['12', 14400],
+	['11.5', 14200],
+	['11', 14000],
+	['< 10.5', 14000]
 ]
+
+
+
+
+
 
 
 const readRegions = (resolve: (value: Region[]) => void) =>
@@ -52,14 +106,47 @@ const main = async () => {
 	const regions = await (new Promise<Region[]>(readRegions))
 
 	try {
+		await prisma.$executeRaw`SET foreign_key_checks = 0`
+		await prisma.$executeRaw`truncate table product_attrs`
+		await prisma.$executeRaw`truncate table prices`
+		await prisma.$executeRaw`truncate table products`
+		await prisma.$executeRaw`truncate table orgs`
+		await prisma.$executeRaw`truncate table regions`
+		await prisma.$executeRaw`truncate table societies`
+		await prisma.$executeRaw`SET foreign_key_checks = 1`
+
 		await prisma.region.createMany({
 			data: regions
+		})
+
+
+		await prisma.society.createMany({
+			data: societies
 		})
 
 		await prisma.org.createMany({
 			data: orgs
 		})
 
+		for (const data of uniProducts)
+			await prisma.product.create({ data })
+
+
+		for (const [name, price] of productsPrices) {
+			const data: Prisma.ProductCreateInput = {
+				name,
+				parent: {
+					connect: { id: 2 }
+				},
+				prices: {
+					create: {
+						orgId: 2, price
+					}
+				}
+			}
+
+			await prisma.product.create({data})
+		}
 	}
 	finally {
 		await prisma.$disconnect()

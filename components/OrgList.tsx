@@ -1,9 +1,12 @@
 import {Fragment} from 'react'
 
+import Link from 'next/link'
+
 import {List} from '.'
 
-import {org, tradeMap, regionMap} from 'stores'
 
+import {tradeMap, regionMap} from 'stores'
+import {org} from 'stores/home'
 
 import sty from 'styles/list.module.sass'
 
@@ -15,12 +18,11 @@ const OrgList = () => {
 
     return <List
         className={sty.orgs} store={org.list}
-        compareFn={(it1, it2) => it1.regionId > it2.regionId ? 1 : -1}
         group={['regionId', region]}
     >
         {
             it => <Fragment key={it.id}>
-                <span>{it.name}</span>
+                <Link href={'org/' + it.id}>{it.name}</Link>
                 <span>{it.legalAddr}</span>
                 <span>{tradeMap[it.trade]}</span>
             </Fragment>

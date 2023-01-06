@@ -2,9 +2,10 @@ import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
 
-import {NewItem, Input, Select, List, PriceList, OrgList} from 'components'
+import {NewItem, Input, Select, List, OrgList} from 'components'
 
-import {region, product, price, org, fetchData, regionList} from 'stores'
+import {region, product, price, org, fetchData} from 'stores/home'
+import {regionList} from 'stores'
 
 
 import sty from 'styles/home.module.sass'
@@ -92,7 +93,7 @@ const Home: NextPage<Props> = p => {
 		<main className={sty.main}>
 			<div className={sty.tabs}>
 				{
-					['Регионы', 'Производители', 'Продукты', 'Цены'].map((it, i) =>
+					['Регионы', 'Производители', 'Продукты'].map((it, i) =>
 						<TabButton key={i} num={i} title={it} />
 					)
 				}
@@ -115,11 +116,6 @@ const Home: NextPage<Props> = p => {
 					}</List>
 					<hr />
 					<NewProduct />
-				</div>
-				<div>
-					<PriceList />
-					<hr />
-					<NewPrice />
 				</div>
 			</div>
 		</main>

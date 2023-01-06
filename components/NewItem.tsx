@@ -11,7 +11,7 @@ const NewToggler = (p: { id: string, edit: store.Edit<any> }) => {
 	return <span className={sty.newToggler}>
 		<input
 			type='radio' id={p.id} className='_T_'
-			onClick={e => p.edit.opened = e.currentTarget.checked}/>
+			onClick={e => p.edit.edited = e.currentTarget.checked}/>
 		<label htmlFor={p.id}> добавить</label>
 	</span>
 }
@@ -35,7 +35,7 @@ type Props = {
 }
 
 const NewItem = (p: Props) => {
-	const opened = p.store.useOpened()
+	const opened = p.store.isEdited()
 	return opened
 		? <SubmitToggler {...p}>
 			{p.children}

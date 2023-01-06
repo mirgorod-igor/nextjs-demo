@@ -2,7 +2,8 @@ import {Fragment} from 'react'
 
 import {List} from '.'
 
-import {price, productMap, regionMap} from 'stores'
+import {productMap, regionMap} from 'stores'
+import {price} from 'stores/home'
 
 import sty from 'styles/list.module.sass'
 
@@ -14,7 +15,6 @@ const PriceList = () => {
 
     return <List
         className={sty.prices} store={price.list}
-        compareFn={(it1, it2) => it1.regionId > it2.regionId ? 1 : -1}
         group={['regionId', region]}
     >
         {
