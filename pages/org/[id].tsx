@@ -30,7 +30,7 @@ const Details = () => {
         <TreeList store={products}>{
             it => <>
                 <span style={{ textIndent: (it.level??0) * 40 + 'px' }}>{it.name}</span>
-                <span>{it.prices?.[0]?.price}</span>
+                <span>{it.price}</span>
             </>
         }</TreeList>
     </div>

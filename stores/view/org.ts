@@ -1,11 +1,11 @@
 import ViewItem from 'stores/ViewItem'
-import {Org, Price, Prisma, Product} from '@prisma/client'
+import {Org, Product} from '@prisma/client'
 
 import PagedList from 'stores/PagedList'
 
 
 
-class ProductList extends PagedList<TreeItem<Product & { prices: Pick<Price, 'price'>[] }>> {
+class ProductList extends PagedList<TreeItem<Product & { price: number }>> {
     #orgId?: number
 
     constructor() {

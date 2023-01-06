@@ -47,6 +47,23 @@ const orgs: Prisma.OrgCreateManyInput[] = [
 		headId: 1,
 		trade: 'w',
 		legalAddr: 'ул. Комсомольский Спуск, дом 1, 4 этаж, комната 27'
+	},
+	{
+		societyId: 1,
+		name: 'Зерновой Терминальный комплекс Тамань',
+		short: 'ЗТКТ',
+		regionId: 542415,
+		headId: 1,
+		trade: 'w',
+		legalAddr: 'п. Волна, 1500м западнее'
+	},
+	{
+		societyId: 1,
+		name: 'Канмаш АГРО',
+		short: 'Канмаш АГРО',
+		regionId: 567395,
+		trade: 'w',
+		legalAddr: 'ул.Красноармейская, д,72'
 	}
 ]
 
@@ -60,11 +77,8 @@ const uniProducts: Prisma.ProductCreateInput[] = [
 		}
 	},
 	{
-		name: 'Зубная паста'
+		name: 'Плуг чизельный'
 	},
-	{
-		name: 'Велотренажер'
-	}
 ]
 
 
@@ -92,6 +106,23 @@ const productsPrices: Record<number, [string, number][]> = {
 		['11', 11300],
 		['10.5', 10100],
 		['< 10.5', 9600]
+	],
+	4: [
+		//['14.5', 13300],
+		//['14', 12600],
+		['13.5', 14200],
+		['13', 14100],
+		['12.5', 13900],
+		['12', 13600],
+		['11.5', 13200],
+		/*['11', 11300],
+		['10.5', 10100],
+		['< 10.5', 9600]*/
+	],
+	5: [
+		['ПЧН-2,3', 18000],
+		['ПЧН-3,2', 21000],
+		['ПЧН-4,5', 24000],
 	]
 }
 
@@ -115,6 +146,26 @@ const readRegions = (resolve: (value: Region[]) => void) =>
 			resolve(regions)
 		})
 
+
+
+const createProductPrices = async (orgs: number[], parentId: number) => {
+	for (const orgId of orgs)
+		for (const [name, price] of productsPrices[orgId]) {
+			const data: Prisma.ProductCreateInput = {
+				name,
+				parent: {
+					connect: {id: parentId}
+				},
+				prices: {
+					create: {
+						orgId, price
+					}
+				}
+			}
+
+			await prisma.product.create({data})
+		}
+}
 
 const main = async () => {
 	const regions = await (new Promise<Region[]>(readRegions))
@@ -146,22 +197,8 @@ const main = async () => {
 			await prisma.product.create({ data })
 
 
-		for (const orgId of [2, 3])
-			for (const [name, price] of productsPrices[orgId]) {
-				const data: Prisma.ProductCreateInput = {
-					name,
-					parent: {
-						connect: { id: 2 }
-					},
-					prices: {
-						create: {
-							orgId, price
-						}
-					}
-				}
-
-				await prisma.product.create({data})
-			}
+		await createProductPrices([2, 3, 4], 2)
+		await createProductPrices([5], 3)
 	}
 	finally {
 		await prisma.$disconnect()

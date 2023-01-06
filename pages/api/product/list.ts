@@ -1,63 +1,48 @@
 import {NextApiRequest, NextApiResponse} from 'next'
 
-import {Product} from '@prisma/client'
-
 import prisma from 'lib/prisma'
 import 'lib/ext'
 
 
-type P = Product & {
-	prices?: { price: number }[]
-	childs?: P[]
+
+type Node = IdName & {
+	price?: number
+	parentId?: number|null
+	childs?: Node[]
 }
 
-const prices = async (orgId: number) => {
-	await prisma.price.findMany({
-		where: {
-			orgId, product: {
-				parent: {
-					is: null
-				}
-			}
-		}
-	})
-}
-
-const findMany = async (parentId: number|null, orgId?: number, skip?: number, take?: number) =>
-	await prisma.product.findMany({
+const loadRelationProducts = async (ids: number[], childs?: Node[], prices?: Record<number, number>) => {
+	const items: Node[] = await prisma.product.findMany({
 		select: {
-			id: true, name: true,
-			prices: parentId ? {
-				select: { price: true }
-			} : false
+			id: true, name: true, parentId: true
 		},
 		where: {
-			parentId,
-			// корневые
-			childs: !parentId && orgId ? {
-				some: {
-					prices: {
-						every: { orgId }
-					}
-				}
-			} : undefined,
-			prices: {
-				every: {
-					/*OR: [
-						{
-							org: {
-								id: orgId
-							}
-						},
-						{
-							org: {
-								is: null
-							}
-						}
-					]*/
-					orgId
-				},
-			}
+			id: { in: ids }
+		}
+	})
+
+	const pids = new Set<number>()
+	for (const it of items) {
+		it.price = prices?.[it.id]
+		if (childs)
+			it.childs = childs.filter(ch => (ch.parentId == it.id && (ch.parentId = undefined, true)))
+
+		if (it.parentId)
+			pids.add(it.parentId)
+	}
+
+
+	return pids.size ? await loadRelationProducts(Array.from(pids.values()), items) : items
+}
+
+
+const findMany = async (skip?: number, take?: number) =>
+	await prisma.product.findMany({
+		select: {
+			id: true, name: true
+		},
+		where: {
+			parentId: null
 		},
 		skip, take,
 		orderBy: {
@@ -66,20 +51,6 @@ const findMany = async (parentId: number|null, orgId?: number, skip?: number, ta
 	})
 
 
-
-const relations = async (items: P[], orgId?: number) => {
-	for (const it of items) {
-		if (it) {
-			it.childs = await findMany(it.id, orgId) as P[]
-			console.log('>>> org ' + orgId + ', parent product', it)
-
-			if (it.childs.length)
-				await relations(it.childs, orgId)
-			else
-				it.childs = undefined
-		}
-	}
-}
 
 
 type Query = {
@@ -94,6 +65,7 @@ export default async function handler(
 	res: NextApiResponse<api.PagedList<any>>
 ) {
 	const q = req.query as Query
+		, orgId = q.orgId?.int
 
 	await (
 		new Promise((res) => setTimeout(() => {res(true)}, 3000))
@@ -102,22 +74,39 @@ export default async function handler(
 	const [skip, take] = q.page_num && q.page_size
 		? [q.page_num.int * q.page_size.int, q.page_size.int] : []
 
-	const items = await findMany(null, q.orgId?.int, skip, take)
-	console.log('>>> root items', items)
 
-	if (q.tree)
-		await relations(items as P[], q.orgId?.int)
+	if (orgId) {
+		// сначала ищем цены по orgId
+		const [ prices, total ] = await Promise.all([
+			prisma.price.findMany({
+				skip, take,
+				where: { orgId }
+			}),
+			prisma.price.count({
+				where: { orgId }
+			})
+		])
 
-	const total = await prisma.product.count({
-		where: {
-			parentId: null,
-		}
-	})
 
-	console.log('products', q.orgId, items)
+		// собираем productId
+		const items = await loadRelationProducts(
+			prices.map(it => it.productId),
+			undefined,
+			prices.reduce((res, it) => ((res[it.productId] = it.price), res), {})
+		)
 
-	res.json({
-		items, total
-	})
+		res.json({ items, total })
+	}
+	else {
+		const [ items, total ] = await Promise.all([
+			findMany(skip, take),
+			prisma.product.count({
+				where: {
+					parentId: null
+				}
+			})
+		])
 
+		res.json({ items, total })
+	}
 }

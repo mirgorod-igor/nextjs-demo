@@ -25,9 +25,10 @@ export default async function handler(
 
 	const items = await prisma.org.findMany({
 		skip, take,
-		orderBy: {
-			name: 'asc'
-		}
+		orderBy: [
+			{ regionId: 'asc' },
+			{ name: 'asc' }
+		]
 	})
 
 	//const data = items.groupBy('regionId')
