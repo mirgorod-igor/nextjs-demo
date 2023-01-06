@@ -11,6 +11,17 @@ type P = Product & {
 	childs?: P[]
 }
 
+const prices = async (orgId: number) => {
+	await prisma.price.findMany({
+		where: {
+			orgId, product: {
+				parent: {
+					is: null
+				}
+			}
+		}
+	})
+}
 
 const findMany = async (parentId: number|null, orgId?: number, skip?: number, take?: number) =>
 	await prisma.product.findMany({
@@ -22,13 +33,31 @@ const findMany = async (parentId: number|null, orgId?: number, skip?: number, ta
 		},
 		where: {
 			parentId,
-			childs: orgId ? {
+			// корневые
+			childs: !parentId && orgId ? {
 				some: {
 					prices: {
 						every: { orgId }
 					}
 				}
 			} : undefined,
+			prices: {
+				every: {
+					/*OR: [
+						{
+							org: {
+								id: orgId
+							}
+						},
+						{
+							org: {
+								is: null
+							}
+						}
+					]*/
+					orgId
+				},
+			}
 		},
 		skip, take,
 		orderBy: {
@@ -42,9 +71,10 @@ const relations = async (items: P[], orgId?: number) => {
 	for (const it of items) {
 		if (it) {
 			it.childs = await findMany(it.id, orgId) as P[]
+			console.log('>>> org ' + orgId + ', parent product', it)
 
 			if (it.childs.length)
-				relations(it.childs)
+				await relations(it.childs, orgId)
 			else
 				it.childs = undefined
 		}
@@ -65,10 +95,15 @@ export default async function handler(
 ) {
 	const q = req.query as Query
 
+	await (
+		new Promise((res) => setTimeout(() => {res(true)}, 3000))
+	)
+
 	const [skip, take] = q.page_num && q.page_size
 		? [q.page_num.int * q.page_size.int, q.page_size.int] : []
 
 	const items = await findMany(null, q.orgId?.int, skip, take)
+	console.log('>>> root items', items)
 
 	if (q.tree)
 		await relations(items as P[], q.orgId?.int)
@@ -78,10 +113,6 @@ export default async function handler(
 			parentId: null,
 		}
 	})
-
-	await (
-		new Promise((res) => setTimeout(() => {res(true)}, 3000))
-	)
 
 	console.log('products', q.orgId, items)
 

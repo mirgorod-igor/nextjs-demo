@@ -17,7 +17,7 @@ const Card = () => {
     return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
         <i>Наименоваие</i>
         <span>{view.data.name}</span>
-        <i>Юр. адрес</i>
+        <i>Юридический адрес</i>
         <span>{view.data.legalAddr}</span>
     </div>
 }
@@ -30,7 +30,7 @@ const Details = () => {
         <TreeList store={products}>{
             it => <>
                 <span style={{ textIndent: (it.level??0) * 40 + 'px' }}>{it.name}</span>
-                <span>{it.prices[0].price}</span>
+                <span>{it.prices?.[0]?.price}</span>
             </>
         }</TreeList>
     </div>

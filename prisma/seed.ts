@@ -69,17 +69,31 @@ const uniProducts: Prisma.ProductCreateInput[] = [
 
 
 
-const productsPrices: [string, number][] = [
-	['14.5', 14400],
-	['14', 14400],
-	['13.5', 14400],
-	['13', 14400],
-	['12.5', 14400],
-	['12', 14400],
-	['11.5', 14200],
-	['11', 14000],
-	['< 10.5', 14000]
-]
+const productsPrices: Record<number, [string, number][]> = {
+	2: [
+		['14.5', 14400],
+		['14', 14400],
+		['13.5', 14400],
+		['13', 14400],
+		['12.5', 14400],
+		['12', 14400],
+		['11.5', 14200],
+		['11', 14000],
+		['10.5', 14000]
+	],
+	3: [
+		['14.5', 13300],
+		['14', 12600],
+		['13.5', 12400],
+		['13', 12100],
+		['12.5', 11900],
+		['12', 11800],
+		['11.5', 11600],
+		['11', 11300],
+		['10.5', 10100],
+		['< 10.5', 9600]
+	]
+}
 
 
 
@@ -132,21 +146,22 @@ const main = async () => {
 			await prisma.product.create({ data })
 
 
-		for (const [name, price] of productsPrices) {
-			const data: Prisma.ProductCreateInput = {
-				name,
-				parent: {
-					connect: { id: 2 }
-				},
-				prices: {
-					create: {
-						orgId: 2, price
+		for (const orgId of [2, 3])
+			for (const [name, price] of productsPrices[orgId]) {
+				const data: Prisma.ProductCreateInput = {
+					name,
+					parent: {
+						connect: { id: 2 }
+					},
+					prices: {
+						create: {
+							orgId, price
+						}
 					}
 				}
-			}
 
-			await prisma.product.create({data})
-		}
+				await prisma.product.create({data})
+			}
 	}
 	finally {
 		await prisma.$disconnect()
