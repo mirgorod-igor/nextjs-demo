@@ -22,14 +22,14 @@ const Card = () => {
         , item = product.data ?? {}
 
     return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
+        <i>Наименоваие</i>
+        <span>{item.name}</span>
         {
             item.parent && <>
                 <i>Группа</i>
                 <Link href={`${item.parent.id}`}>{item.parent.name}</Link>
             </>
         }
-        <i>Наименоваие</i>
-        <span>{item.name}</span>
         {
             !!item.childs?.length && <>
                 <i>Разновидности</i>

@@ -4,7 +4,7 @@
 
 .main
     display: flex
-    column-gap: 16px
+    gap: 16px
     width: 80%
     margin: auto
 
@@ -51,9 +51,20 @@
     flex: 3
 
 
-
-
-
 .tabContent
     grid-column: span 2
+
+
+@media screen and (max-width: 1600px)
+    .main
+        width: 90%
+@media screen and (max-width: 1200px)
+    .main
+        flex-flow: column
+        .card
+            grid-template-columns: 1fr 2fr
+            flex: 0
+            row-gap: 16px
+            > i
+                margin: 0
 
