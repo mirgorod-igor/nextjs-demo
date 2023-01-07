@@ -16,8 +16,14 @@ const Card = () => {
         , wait = st == 'wait' ? ' '+sty.wait : ''
 
     return <div className={sty.card + wait}>
-        <i>Наименоваие</i>
+        <i>Наименование</i>
         <Link href={`/product/${item.id}`}>{item.name}</Link>
+        {
+            !!item.parent && <>
+                <i>Группа</i>
+                <Link href={`/product/${item.parent.id}`}>{item.parent.name}</Link>
+            </>
+        }
         <i>Производитель</i>
         <Link href={`/org/${org?.id}`}>{org?.name}</Link>
         <i>Цена</i>

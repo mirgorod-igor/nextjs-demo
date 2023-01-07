@@ -21,7 +21,7 @@ const Card = () => {
         , item = view.data
 
     return <div className={sty.card + wait}>
-        <i>Наименоваие</i>
+        <i>Наименование</i>
         <span>{item.name}</span>
         {
             item.parent && <>
