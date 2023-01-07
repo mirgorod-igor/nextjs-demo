@@ -37,10 +37,10 @@ const TreeList = <T extends TreeItem<T>,>(p: Props<T>) => {
     const st = p.store.useStatus()
         , items = p.store.items
 
-    const loading = !st || st == 'wait' ? ' '+sty.loading : ''
+    const wait = !st || st == 'wait' ? ' '+sty.wait : ''
 
     return <>
-        <div className={sty.list + loading}>
+        <div className={sty.list + wait}>
             {
                 items.map((it, i) =>
                     <Tree key={i} item={it} children={p.children} level={0} />

@@ -16,7 +16,6 @@ import sty from 'styles/view.module.sass'
 
 
 
-
 const Card = () => {
     const wait = view.useStatus() == 'wait' ? ' '+sty.wait : ''
         , item = view.data
@@ -56,8 +55,6 @@ const tabs: [TabId, string, boolean?][] = [
     ['sales', 'Продажи'],
 ]
 const tab = atom<TabId>('prices')
-
-
 
 
 

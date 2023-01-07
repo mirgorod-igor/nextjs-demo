@@ -3,12 +3,16 @@ import {NextPage} from 'next'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
 
-import {RemoveToggler} from 'components'
+import {atom} from 'nanostores'
+import {useStore} from '@nanostores/react'
+
+import {RemoveToggler, TabButtons} from 'components'
 
 import {orgMap, orgs, product} from 'stores/view/product'
 
-import sty from 'styles/view.module.sass'
 import {RemoveItem} from 'stores'
+
+import sty from 'styles/view.module.sass'
 
 
 
@@ -48,28 +52,48 @@ const getRemove = (id: number) =>
     removeStores[id] || (removeStores[id] = new RemoveItem('price', id))
 
 
-const Details = () => {
+
+
+type TabId = 'prices' | 'sales'
+const tabs: [TabId, string, boolean?][] = [
+    ['prices', 'Цены', true],
+    ['sales', 'Продажи'],
+]
+const tab = atom<TabId>('prices')
+
+
+const Prices = () => {
     const st = product.useStatus()
         , item = product.data
         , ost = orgs.useStatus()
-        , wait = ost == 'wait' || st == 'wait' ? ' '+sty.loading : ''
+        , wait = ost == 'wait' || st == 'wait' ? ' '+sty.wait : ''
 
-
-
-    return <div className={sty.details}>
-        <div className={sty.list + wait}>
-            {
-                item.prices?.map(it => <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
-                    <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>
-                    <span>{it.price}</span>
-                </RemoveToggler>)
-            }
-        </div>
+    return <div className={sty.list + wait}>
+        {
+            item.prices?.map(it => <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
+                <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>
+                <span>{it.price}</span>
+            </RemoveToggler>)
+        }
     </div>
 }
 
-const ProductPage: NextPage = () => {
+const TabContent = () => {
+    const t = useStore(tab)
 
+    return t == 'prices' ? <Prices /> : <div></div>
+}
+
+const Details = () => {
+
+    return <div className={sty.details}>
+        <TabButtons items={tabs} state={tab} />
+        <TabContent />
+    </div>
+}
+
+
+const ProductPage: NextPage = () => {
     const {query} = useRouter()
     const id = (query.id as string)?.int
 

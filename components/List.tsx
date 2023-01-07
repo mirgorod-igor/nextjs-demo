@@ -31,7 +31,7 @@ const List = <T extends Id,>(p: Props<T>) => {
 	}
 
 	return <>
-		<div className={`${sty.list} ${wait ? sty.loading : ''} ${p.className ?? ''}`.trim()}>
+		<div className={`${sty.list} ${wait ? sty.wait : ''} ${p.className ?? ''}`.trim()}>
 			{
 				p.store.items.map((it, i) => <Fragment key={i}>
 					{p.group ? group(it) : undefined}

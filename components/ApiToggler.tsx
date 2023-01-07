@@ -7,7 +7,7 @@ type Props = {
     onChange?: ChangeEventHandler<HTMLInputElement>
 }
 
-const Toggler = (p: Props) => {
+const ApiToggler = (p: Props) => {
     const st = p.store.useStatus()
 
     return <input
@@ -17,4 +17,4 @@ const Toggler = (p: Props) => {
 }
 
 
-export default Toggler
+export default ApiToggler

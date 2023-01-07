@@ -1,6 +1,6 @@
 import {ReactNode} from 'react'
 
-import Toggler from './Toggler'
+import {ApiToggler} from '.'
 
 
 import sty from 'styles/home.module.sass'
@@ -18,7 +18,7 @@ const NewToggler = (p: { id: string, edit: store.Edit<any> }) => {
 
 const SubmitToggler = (p: Props) => {
 	return <div className={sty.newItem}>
-		<Toggler id={p.name} store={p.store} name='submit' />
+		<ApiToggler id={p.name} store={p.store} name='submit' />
 		{p.children}
 		<span className='icon:check' onClick={_ => p.store.submit()} />
 		<span className='icon:cancel' onClick={_ => p.store.cancel()} />

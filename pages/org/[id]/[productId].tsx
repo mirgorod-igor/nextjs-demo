@@ -13,11 +13,12 @@ const Card = () => {
     const st = product.useStatus()
         , item = product.data
         , { price, org } = item.prices?.[0] ?? { }
+        , wait = st == 'wait' ? ' '+sty.wait : ''
 
-    return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
+    return <div className={sty.card + wait}>
         <i>Наименоваие</i>
         <Link href={`/product/${item.id}`}>{item.name}</Link>
-        <i>Поставщик</i>
+        <i>Производитель</i>
         <Link href={`/org/${org?.id}`}>{org?.name}</Link>
         <i>Цена</i>
         <span>{price}</span>
