@@ -22,6 +22,9 @@ export default async function handler(
 
     const data = await prisma.org.findUnique({
         include: {
+            region: {
+                select: { id: true, name: true }
+            },
             parent: {
                 select: { id: true, name: true }
             },

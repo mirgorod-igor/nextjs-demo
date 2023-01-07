@@ -14,20 +14,22 @@ import sty from 'styles/view.module.sass'
 
 
 const Card = () => {
-    const st = view.useStatus()
+    const wait = view.useStatus() == 'wait' ? ' '+sty.wait : ''
         , item = view.data
 
-    return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
+    return <div className={sty.card + wait}>
         <i>Наименоваие</i>
         <span>{item.name}</span>
-        <i>Юридический адрес</i>
-        <span>{item.legalAddr}</span>
         {
             item.parent && <>
                 <i>Головная компания</i>
                 <Link href={`/org/`+item.parent.id}>{item.parent.name}</Link>
             </>
         }
+        <i>Регион</i>
+        <span>{item.region?.name}</span>
+        <i>Юридический адрес</i>
+        <span>{item.legalAddr}</span>
         {
             item.childs?.length ? <>
                 <i>Дочерние компании</i>
@@ -59,7 +61,7 @@ const Details = (p: { orgId: number }) => {
 
 const OrgPage: NextPage = () => {
     const {query} = useRouter()
-    const id = (query.id as string)?.int
+    const id = (query?.id as string)?.int
 
     useEffect(() => {
         if (id) {

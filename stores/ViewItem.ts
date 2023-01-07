@@ -20,7 +20,7 @@ class ViewItem<T> extends Api {
         return await this.call(`/api/${this.type}/${id}${params}`)
     }
 
-    get data() {
+    get data(): T {
         return this.#data
     }
 }

@@ -15,7 +15,7 @@ import {RemoveItem} from 'stores'
 
 const Card = () => {
     const st = product.useStatus()
-        , item = product.data
+        , item = product.data ?? {}
 
     return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
         {
@@ -60,7 +60,7 @@ const Details = () => {
         <div className={sty.list + wait}>
             {
                 item.prices?.map(it => <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
-                    <span>{orgMap[it.orgId!]}</span>
+                    <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>
                     <span>{it.price}</span>
                 </RemoveToggler>)
             }

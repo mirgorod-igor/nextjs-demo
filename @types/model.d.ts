@@ -6,9 +6,9 @@ interface IdName extends Id {
     name
 }
 
-type TreeItem<T> = T & IdName & {
+interface TreeItem<T> extends IdName {
     parent?: T & IdName|null
-    childs?: TreeItem<T>[]
+    childs?: (T & TreeItem<T>)[]
 }
 
 interface Price extends Id {
@@ -17,12 +17,12 @@ interface Price extends Id {
     price: number
 }
 
-
-type Product = TreeItem<Product> & {
+interface Product extends TreeItem<Product> {
     price?: number
     prices: Price[]
 }
 
-type Org = TreeItem<Org> & {
+interface Org extends TreeItem<Org> {
     legalAddr: string
+    region: IdName
 }
