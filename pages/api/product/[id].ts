@@ -1,27 +1,35 @@
 import {NextApiRequest, NextApiResponse} from 'next'
-import {Org} from '@prisma/client'
 
 
 import prisma from 'lib/prisma'
 import 'lib/ext'
 
-
 import {sleep} from 'utils/sleep'
-
 
 
 type Query = {
     id: string
+    orgId?: string
 }
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<api.View<Org>>
+    res: NextApiResponse/*<api.View<{ product: Product|null, orgs?: IdName[] }>>*/
 ) {
     const q = req.query as Query
+        , id = q.id.int
+        , orgId = q.orgId?.int
 
-    const data = await prisma.org.findUnique({
+
+    const data = await prisma.product.findUnique({
         include: {
+            prices: {
+                select: {
+                    id: true, orgId: !orgId, price: true,
+                    org: !!orgId ? { select: { id: true, name: true } } : false
+                },
+                where: orgId ? { orgId } : undefined
+            },
             parent: {
                 select: { id: true, name: true }
             },
@@ -29,7 +37,7 @@ export default async function handler(
                 select: { id: true, name: true }
             }
         },
-        where: { id: q.id.int }
+        where: { id }
     })
 
 
@@ -37,7 +45,7 @@ export default async function handler(
 
     await sleep()
 
-    console.log('org', data)
+    console.log('product', data)
 
     res.json({ status, data })
 }

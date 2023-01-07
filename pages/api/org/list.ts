@@ -5,6 +5,8 @@ import {Org} from '@prisma/client'
 import prisma from 'lib/prisma'
 import 'lib/ext'
 
+import {sleep} from 'utils/sleep'
+
 
 
 
@@ -31,13 +33,9 @@ export default async function handler(
 		]
 	})
 
-	//const data = items.groupBy('regionId')
-
 	const total = await prisma.org.count()
 
-	await (
-		new Promise((res) => setTimeout(() => {res(true)}, 3000))
-	)
+	await sleep()
 
 	console.log('orgs', items)
 

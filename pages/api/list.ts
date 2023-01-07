@@ -4,6 +4,7 @@ import {Prisma, PrismaClient} from '@prisma/client'
 import prisma from 'lib/prisma'
 
 import 'lib/ext'
+import {sleep} from 'utils/sleep'
 
 
 type Include = Prisma.ProductInclude
@@ -75,9 +76,7 @@ export default async function handler(
 	// @ts-ignore
 	const total = await prisma[q.type].count()
 
-	await (
-		new Promise((res) => setTimeout(() => {res(true)}, 3000))
-	)
+	await sleep()
 
 	console.log(q.type, items)
 

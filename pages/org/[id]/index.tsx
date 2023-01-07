@@ -23,9 +23,9 @@ const Card = () => {
         <i>Юридический адрес</i>
         <span>{item.legalAddr}</span>
         {
-            item.head && <>
+            item.parent && <>
                 <i>Головная компания</i>
-                <Link href={`/org/`+item.head.id}>{item.head.name}</Link>
+                <Link href={`/org/`+item.parent.id}>{item.parent.name}</Link>
             </>
         }
         {
@@ -33,7 +33,7 @@ const Card = () => {
                 <i>Дочерние компании</i>
                 <ul>
                     {
-                        view.data.childs.map(it =>
+                        item.childs.map(it =>
                             <Link key={it.id} href={`/org/`+it.id}>{it.name}</Link>)
                     }
                 </ul>
@@ -43,13 +43,13 @@ const Card = () => {
 }
 
 
-const Details = () => {
+const Details = (p: { orgId: number }) => {
     const st = products.useStatus()
 
     return <div className={sty.details + ' ' + (st == 'wait' ? sty.wait : '')}>
         <TreeList store={products}>{
-            it => <>
-                <span style={{ textIndent: (it.level??0) * 40 + 'px' }}>{it.name}</span>
+            (it, level) => <>
+                <Link href={`${p.orgId}/${it.id}`} style={{ textIndent: level * 40 + 'px' }}>{it.name}</Link>
                 <span>{it.price}</span>
             </>
         }</TreeList>
@@ -72,7 +72,7 @@ const OrgPage: NextPage = () => {
 
     return <main className={sty.main}>
         <Card />
-        <Details />
+        <Details orgId={id} />
     </main>
 }
 

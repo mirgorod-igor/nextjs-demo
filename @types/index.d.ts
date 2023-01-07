@@ -1,16 +1,4 @@
-type Id = {
-	id: number
-}
 
-type IdName = Id & {
-	name
-}
-
-
-type TreeItem<T> = T & IdName & {
-	childs: Entity<T>[]
-	level?: number
-}
 
 type ModelType = 'region' | 'product' | 'price' | 'org'
 

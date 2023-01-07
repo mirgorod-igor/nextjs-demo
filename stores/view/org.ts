@@ -1,11 +1,9 @@
-import ViewItem from 'stores/ViewItem'
-import {Org, Product} from '@prisma/client'
-
-import PagedList from 'stores/PagedList'
+import ViewItem from '../ViewItem'
+import PagedList from '../PagedList'
 
 
 
-class ProductList extends PagedList<TreeItem<Product & { price: number }>> {
+class ProductList extends PagedList<Product> {
     #orgId?: number
 
     constructor() {
@@ -13,7 +11,7 @@ class ProductList extends PagedList<TreeItem<Product & { price: number }>> {
     }
 
     protected override get url() {
-        return super.url + '&tree=true&orgId=' + this.#orgId
+        return super.url + '&orgId=' + this.#orgId
     }
 
     async load(orgId: number) {
@@ -23,5 +21,5 @@ class ProductList extends PagedList<TreeItem<Product & { price: number }>> {
 }
 
 export const
-    view = new ViewItem<TreeItem<Org & { head: IdName }>>('org'),
+    view = new ViewItem<Org>('org'),
     products = new ProductList()

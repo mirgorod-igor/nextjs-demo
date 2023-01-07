@@ -27,6 +27,8 @@ model Product {
   childs Product[]     @relation("ProductParent")
   attrs  ProductAttr[]
 
+
+  @@index([name])
   @@map("products")
 }
 
@@ -61,11 +63,11 @@ model Org {
   trade     Trade  @default(w)
   regionId  Int
   legalAddr String
-  headId    Int?
+  parentId  Int?
 
   society Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
-  head    Org?    @relation("head", fields: [headId], references: [id])
-  childs  Org[]   @relation("head")
+  parent  Org?    @relation("OrgHead", fields: [parentId], references: [id])
+  childs  Org[]   @relation("OrgHead")
   region  Region  @relation(fields: [regionId], references: [id], onDelete: Cascade)
   prices  Price[]
 

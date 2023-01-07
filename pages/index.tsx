@@ -9,6 +9,7 @@ import {regionList} from 'stores'
 
 
 import sty from 'styles/home.module.sass'
+import Link from 'next/link'
 
 
 
@@ -112,7 +113,7 @@ const Home: NextPage<Props> = p => {
 				</div>
 				<div>
 					<List store={product.list}>{
-						it => <span>{it.name}</span>
+						it => <Link href={`product/${it.id}`}>{it.name}</Link>
 					}</List>
 					<hr />
 					<NewProduct />

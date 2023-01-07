@@ -2,6 +2,7 @@ import {NextApiRequest, NextApiResponse} from 'next'
 
 import prisma from 'lib/prisma'
 import 'lib/ext'
+import {sleep} from 'utils/sleep'
 
 
 
@@ -67,9 +68,7 @@ export default async function handler(
 	const q = req.query as Query
 		, orgId = q.orgId?.int
 
-	await (
-		new Promise((res) => setTimeout(() => {res(true)}, 3000))
-	)
+	await sleep()
 
 	const [skip, take] = q.page_num && q.page_size
 		? [q.page_num.int * q.page_size.int, q.page_size.int] : []

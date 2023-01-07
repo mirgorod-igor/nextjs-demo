@@ -24,3 +24,8 @@ export const
 regionList.listenItems(items => {
 	items.map(it => regionMap[it.id] = it.name)
 })
+
+
+
+export {default as List} from './List'
+export {default as RemoveItem} from './RemoveItem'

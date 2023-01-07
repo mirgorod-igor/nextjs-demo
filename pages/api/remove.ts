@@ -3,6 +3,7 @@ import {NextApiRequest, NextApiResponse} from 'next'
 import {randomInt} from 'crypto'
 
 import prisma from 'lib/prisma'
+import {sleep} from 'utils/sleep'
 
 
 
@@ -24,9 +25,7 @@ export default async function handler(
 	const tryRemove = randomInt(0, 100) > 50
 
 	try {
-		await (
-			new Promise((res) => setTimeout(() => {res(true)}, 4000))
-		)
+		await sleep(4000)
 
 		if (tryRemove) {
 		//if (false) {

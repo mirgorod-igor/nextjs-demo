@@ -35,7 +35,7 @@ const orgs: Prisma.OrgCreateManyInput[] = [
 		name: 'Новороссийский Зерновой Терминал',
 		short: 'НЗТ CPT',
 		regionId: 542415,
-		headId: 1,
+		parentId: 1,
 		trade: 'w',
 		legalAddr: 'ул. Портовая, 14А'
 	},
@@ -44,7 +44,7 @@ const orgs: Prisma.OrgCreateManyInput[] = [
 		name: 'Таганрогский судоремонтный завод CPT',
 		short: 'ТСРЗ CPT',
 		regionId: 501165,
-		headId: 1,
+		parentId: 1,
 		trade: 'w',
 		legalAddr: 'ул. Комсомольский Спуск, дом 1, 4 этаж, комната 27'
 	},
@@ -53,7 +53,7 @@ const orgs: Prisma.OrgCreateManyInput[] = [
 		name: 'Зерновой Терминальный комплекс Тамань',
 		short: 'ЗТКТ',
 		regionId: 542415,
-		headId: 1,
+		parentId: 1,
 		trade: 'w',
 		legalAddr: 'п. Волна, 1500м западнее'
 	},
@@ -72,12 +72,35 @@ const uniProducts: Prisma.ProductCreateInput[] = [
 	{
 		name: 'Пшеница', childs: {
 			create: {
-				name: 'Протеин'
+				name: 'Протеин', childs: {
+					createMany: {
+						data: [
+							{ name: '14.5' },
+							{ name: '14' },
+							{ name: '13.5' },
+							{ name: '13' },
+							{ name: '12.5' },
+							{ name: '12' },
+							{ name: '11.5' },
+							{ name: '11' },
+							{ name: '10.5' },
+							{ name: '< 10.5' }
+						]
+					}
+				}
 			}
 		}
 	},
 	{
-		name: 'Плуг чизельный'
+		name: 'Плуг чизельный', childs: {
+			createMany: {
+				data: [
+					{ name: 'ПЧН-2,3' },
+					{ name: 'ПЧН-3,2' },
+					{ name: 'ПЧН-4,5' },
+				]
+			}
+		}
 	},
 ]
 
@@ -148,22 +171,23 @@ const readRegions = (resolve: (value: Region[]) => void) =>
 
 
 
-const createProductPrices = async (orgs: number[], parentId: number) => {
+const createPrices = async (orgs: number[], parentId: number) => {
+	const prods: Record<number, any> = {}
 	for (const orgId of orgs)
 		for (const [name, price] of productsPrices[orgId]) {
-			const data: Prisma.ProductCreateInput = {
-				name,
-				parent: {
-					connect: {id: parentId}
-				},
-				prices: {
-					create: {
-						orgId, price
-					}
-				}
+			if (!prods[name]) {
+				const p = await prisma.product.findFirst({
+					select: { id: true },
+					where: { name }
+				})
+				prods[name] = p!.id
 			}
 
-			await prisma.product.create({data})
+			await prisma.price.create({
+				data: {
+					orgId, productId: prods[name], price
+				}
+			})
 		}
 }
 
@@ -197,8 +221,9 @@ const main = async () => {
 			await prisma.product.create({ data })
 
 
-		await createProductPrices([2, 3, 4], 2)
-		await createProductPrices([5], 3)
+
+		await createPrices([2, 3, 4], 2)
+		await createPrices([5], 3)
 	}
 	finally {
 		await prisma.$disconnect()

@@ -1,6 +1,6 @@
 import Api from 'stores/Api'
 
-class ViewItem<T = any> extends Api {
+class ViewItem<T> extends Api {
     #data = { } as T
 
     constructor(
@@ -13,8 +13,11 @@ class ViewItem<T = any> extends Api {
         this.#data = data.data ?? {} as T
     }
 
-    async fetch(id: number) {
-        return await this.call(`/api/${this.type}/${id}`)
+    async fetch(id: number, args?) {
+        const params = args
+            ? '?'+Object.keys(args).map(key => `${key}=${args[key]}`).join('&')
+            : ''
+        return await this.call(`/api/${this.type}/${id}${params}`)
     }
 
     get data() {

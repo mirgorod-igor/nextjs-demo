@@ -8,7 +8,8 @@ import {ReactNode} from 'react'
 
 
 type TreeProps<T> = TreeItem<T> & {
-    children: (it: TreeItem<T>) => ReactNode
+    level?: number
+    children: (it: TreeItem<T>, level: number) => ReactNode
 }
 
 const Tree = <T,>(p: TreeProps<T>) => {
@@ -19,13 +20,13 @@ const Tree = <T,>(p: TreeProps<T>) => {
         }
     </> : <RemoveToggler id={p.id} store={product.list.remove(p.id)}>
         {/*<span style={{ textIndent: (p.level??0) * 40 + 'px' }}>{p.name}</span>*/}
-        {p.children(p)}
+        {p.children(p, p.level??0)}
     </RemoveToggler>
 }
 
 
 type Props<T> = {
-    children: (it: TreeItem<T>) => ReactNode
+    children: (it: TreeItem<T>, level: number) => ReactNode
     store: store.PagedList<TreeItem<T>>
 }
 
