@@ -3,10 +3,14 @@ import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
 
-import {TreeList} from 'components'
+import {atom} from 'nanostores'
+import {useStore} from '@nanostores/react'
+
+
+import {TabButtons, TreeList} from 'components'
+
 
 import {view, products} from 'stores/view/org'
-
 
 import sty from 'styles/view.module.sass'
 
@@ -45,16 +49,38 @@ const Card = () => {
 }
 
 
-const Details = (p: { orgId: number }) => {
-    const st = products.useStatus()
 
-    return <div className={sty.details + ' ' + (st == 'wait' ? sty.wait : '')}>
-        <TreeList store={products}>{
+type TabId = 'prices' | 'sales'
+const tabs: [TabId, string, boolean?][] = [
+    ['prices', 'Цены', true],
+    ['sales', 'Продажи'],
+]
+const tab = atom<TabId>('prices')
+
+
+
+
+
+const TabContent = (p: { orgId: number }) => {
+    const t = useStore(tab)
+
+    return t == 'prices'
+        ? <TreeList store={products}>{
             (it, level) => <>
                 <Link href={`${p.orgId}/${it.id}`} style={{ textIndent: level * 40 + 'px' }}>{it.name}</Link>
                 <span>{it.price}</span>
             </>
         }</TreeList>
+        : <></>
+}
+
+const Details = (p: { orgId: number }) => {
+    const st = products.useStatus()
+        , wait = st == 'wait' ? ' ' + sty.wait : ''
+
+    return <div className={sty.details + wait}>
+        <TabButtons state={tab} items={tabs} />
+        <TabContent orgId={p.orgId} />
     </div>
 }
 
