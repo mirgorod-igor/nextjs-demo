@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import {Fragment, useEffect} from 'react'
 import {NextPage} from 'next'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
@@ -6,6 +6,9 @@ import {useRouter} from 'next/router'
 import {orgs, product} from 'stores/view/product'
 
 import sty from 'styles/view.module.sass'
+import {atom} from 'nanostores'
+import {TabButtons} from 'components'
+import {useStore} from '@nanostores/react'
 
 
 
@@ -32,22 +35,53 @@ const Card = () => {
         }
         <i>Производитель</i>
         <Link href={`/org/${org?.id}`}>{org?.name}</Link>
-        <i>Цена</i>
-        <span>{price}</span>
+        {
+            !!price && <>
+                <i>Цена</i>
+                <span>{price}</span>
+            </>
+        }
     </div>
 }
 
 
-const Details = () => {
-    const st = orgs.useStatus()
+type TabId = 'prices' | 'sales'
+const tabs: [TabId, string, boolean?][] = [
+    ['prices', 'Цены', true],
+    ['sales', 'Продажи'],
+]
+const tab = atom<TabId>('prices')
 
-    return <div className={sty.details + ' ' + (st == 'wait' ? sty.wait : '')}>
-        {/*<TreeList store={products}>{
-            it => <>
-                <span style={{ textIndent: (it.level??0) * 40 + 'px' }}>{it.name}</span>
-                <span>{it.price}</span>
-            </>
-        }</TreeList>*/}
+
+
+const TabContent = () => {
+    const t = useStore(tab)
+        , st = product.useStatus()
+
+    return st == 'ok'
+        ? t == 'prices'
+            ? <div className={sty.prices}>
+                {product.data.prices?.[0].childs?.map(it =>
+                    <Fragment key={it.id}>
+                        <span><Link href={`/org/${it.org?.id}`}>{it.org?.name}</Link></span>
+                        <b>{it.price}</b>
+                    </Fragment>
+                )}
+            </div>
+            : <div></div>
+        : <></>
+}
+
+const Details = () => {
+    const st = product.useStatus()
+        , ost = orgs.useStatus()
+        , wait = st == 'wait' || ost == 'wait' ? ' ' + sty.wait : ''
+
+    return <div className={sty.details + wait}>
+        <TabButtons state={tab} items={product.data.prices?.[0].childs?.length ? tabs : tabs.slice(1)} />
+        <div className={sty.content}>
+            <TabContent />
+        </div>
     </div>
 }
 

@@ -29,7 +29,12 @@ export default async function handler(
             prices: {
                 select: {
                     id: true, orgId: !orgId, price: true,
-                    org: !!orgId ? { select: { id: true, name: true } } : false
+                    org: !!orgId ? { select: { id: true, name: true } } : false,
+                    childs: {
+                        select: {
+                            id: true, org: { select: { id: true, name: true } }, price: true
+                        }
+                    }
                 },
                 where: orgId ? { orgId } : undefined
             },

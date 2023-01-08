@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import {Fragment, useEffect} from 'react'
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
@@ -30,7 +30,7 @@ const Card = () => {
             </>
         }
         <i>Специализация</i>
-        <span>{item.name}</span>
+        <span>{item.desc}</span>
         <i>Регион</i>
         <span>{item.region?.name}</span>
         <i>Юридический адрес</i>
@@ -60,15 +60,27 @@ const tab = atom<TabId>('prices')
 
 
 
+
 const TabContent = (p: { orgId: number }) => {
     const t = useStore(tab)
 
     return t == 'prices'
         ? <TreeList store={products}>{
-            (it, level) => <>
-                <Link href={`${p.orgId}/${it.id}`} style={{ textIndent: level * 40 + 'px' }}>{it.name}</Link>
-                <span>{it.price}</span>
-            </>
+            (it, level) => <div
+                key={it.id}
+                style={{ textIndent: level * 40 + 'px' }}
+                className={it.prices ? sty.prices : sty.price}
+            >
+                <Link href={`${p.orgId}/${it.id}`}>{it.name}</Link>
+                {
+                    !!it.price
+                        ? <b>{it.price}</b>
+                        : it.prices?.map(it => <Fragment key={it.id}>
+                            <span>{it.org?.name}</span>
+                            <b>{it.price}</b>
+                        </Fragment>)
+                }
+            </div>
         }</TreeList>
         : <></>
 }
@@ -79,7 +91,9 @@ const Details = (p: { orgId: number }) => {
 
     return <div className={sty.details + wait}>
         <TabButtons state={tab} items={tabs} />
-        <TabContent orgId={p.orgId} />
+        <div className={sty.content}>
+            <TabContent orgId={p.orgId} />
+        </div>
     </div>
 }
 

@@ -1,6 +1,7 @@
 import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Head from 'next/head'
+import Link from 'next/link'
 
 import {NewItem, Input, Select, List, OrgList} from 'components'
 
@@ -9,7 +10,6 @@ import {regionList} from 'stores'
 
 
 import sty from 'styles/home.module.sass'
-import Link from 'next/link'
 
 
 
@@ -53,7 +53,7 @@ const NewProduct = () =>
 
 
 
-
+/*
 const NewPrice = () => {
 	return <NewItem name='price' store={price.edit}>
 		<Select edit={price.edit} list={regionList}
@@ -64,7 +64,7 @@ const NewPrice = () => {
 		       onChange={changeHandlerFactory(price.edit, 'price', true)} asNumber />
 	</NewItem>
 }
-
+*/
 
 
 

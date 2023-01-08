@@ -23,12 +23,7 @@ export default async function handler(
 
 
 	const items = await prisma.price.findMany({
-		skip, take,
-		orderBy: {
-			region: {
-				name: 'asc'
-			}
-		}
+		skip, take
 	})
 
 

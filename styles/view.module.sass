@@ -54,9 +54,35 @@
 .details
     flex: 3
 
+    .content
+        overflow: auto
+        height: calc(100% - 50px)
+        margin-top: 16px
 
-.tabContent
-    grid-column: span 2
+
+.price
+    display: flex
+    > a
+        flex: 3
+    > b
+        flex: 1
+
+
+.prices
+    font-size: 0.9rem
+    display: grid
+    grid-template-columns: auto auto auto
+    row-gap: 8px
+
+    > a
+        grid-column: span 3
+
+    > span
+        grid-column: 2
+    > b
+        grid-column: 3
+        justify-self: center
+
 
 
 @media screen and (max-width: 1600px)

@@ -5,14 +5,19 @@ import 'lib/ext'
 import {sleep} from 'utils/sleep'
 
 
+type Pr = {
+	value: number
+	childs?: Price[]
+}
 
 type Node = IdName & {
 	price?: number
+	prices?: Price[]
 	parentId?: number|null
 	childs?: Node[]
 }
 
-const loadRelationProducts = async (ids: number[], childs?: Node[], prices?: Record<number, number>) => {
+const loadRelationProducts = async (ids: number[], childs?: Node[], prices?: Record<number, Pr>) => {
 	const items: Node[] = await prisma.product.findMany({
 		select: {
 			id: true, name: true, parentId: true
@@ -24,7 +29,15 @@ const loadRelationProducts = async (ids: number[], childs?: Node[], prices?: Rec
 
 	const pids = new Set<number>()
 	for (const it of items) {
-		it.price = prices?.[it.id]
+		const pr = prices?.[it.id]
+		if (pr) {
+			if (pr.value)
+				it.price = pr.value
+			else
+				it.prices = pr.childs
+		}
+
+
 		if (childs)
 			it.childs = childs.filter(ch => (ch.parentId == it.id && (ch.parentId = undefined, true)))
 
@@ -78,6 +91,18 @@ export default async function handler(
 		// сначала ищем цены по orgId
 		const [ prices, total ] = await Promise.all([
 			prisma.price.findMany({
+				include: {
+					childs: {
+						select: {
+							org: {
+								select: {
+									id: true, name: true
+								},
+							},
+							id: true, price: true
+						}
+					}
+				},
 				skip, take,
 				where: { orgId }
 			}),
@@ -87,11 +112,14 @@ export default async function handler(
 		])
 
 
+		const pricesWithProduct = prices.filter(it => !!it.productId)
 		// собираем productId
 		const items = await loadRelationProducts(
-			prices.map(it => it.productId),
+			pricesWithProduct.map(it => it.productId!),
 			undefined,
-			prices.reduce((res, it) => ((res[it.productId] = it.price), res), {})
+			pricesWithProduct.reduce((res, it) => ((res[it.productId!] = {
+				value: it.price, childs: it.childs
+			}), res), {})
 		)
 
 		res.json({ items, total })

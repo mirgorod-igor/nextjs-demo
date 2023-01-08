@@ -8,11 +8,10 @@ datasource db {
 }
 
 model Region {
-  id     Int     @id
-  name   String
-  code   String
-  prices Price[]
-  orgs   Org[]
+  id   Int    @id
+  name String
+  code String
+  orgs Org[]
 
   @@map("regions")
 }
@@ -71,37 +70,50 @@ model Society {
   @@map("societies")
 }
 
+model OrgService {
+  id   Int    @id @default(autoincrement())
+  name String
+  orgs Org[]
+
+  @@map("org_services")
+}
+
 model Org {
   id        Int    @id @default(autoincrement())
   societyId Int
   name      String
   short     String
+  desc      String
   trade     Trade  @default(w)
   regionId  Int
   legalAddr String
   parentId  Int?
 
-  society Society @relation(fields: [societyId], references: [id], onDelete: Cascade)
-  parent  Org?    @relation("OrgHead", fields: [parentId], references: [id])
-  childs  Org[]   @relation("OrgHead")
-  region  Region  @relation(fields: [regionId], references: [id], onDelete: Cascade)
-  prices  Price[]
+  services OrgService[]
+  society  Society      @relation(fields: [societyId], references: [id], onDelete: Cascade)
+  parent   Org?         @relation("OrgHead", fields: [parentId], references: [id])
+  childs   Org[]        @relation("OrgHead")
+  region   Region       @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  prices   Price[]
 
   @@map("orgs")
 }
 
 model Price {
-  id        Int   @id @default(autoincrement())
-  productId Int
-  regionId  Int?
-  orgId     Int?
-  price     Float
+  id       Int  @id @default(autoincrement())
+  parentId Int?
 
-  org     Org?    @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  region  Region? @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  productId Int?
+  orgId     Int
+  price     Float?
 
-  @@unique([productId, regionId, orgId])
+  parent Price?  @relation("OrgPrice", fields: [parentId], references: [id])
+  childs Price[] @relation("OrgPrice")
+
+  org     Org      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, orgId])
   @@map("prices")
 }
 
