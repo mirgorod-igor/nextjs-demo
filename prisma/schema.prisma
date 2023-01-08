@@ -17,16 +17,25 @@ model Region {
   @@map("regions")
 }
 
-model Product {
-  id       Int     @id @default(autoincrement())
-  parentId Int?
+model ProductCategory {
+  id       Int       @id @default(autoincrement())
   name     String
-  prices   Price[]
+  products Product[]
 
-  parent Product?      @relation("ProductParent", fields: [parentId], references: [id], onDelete: Cascade)
-  childs Product[]     @relation("ProductParent")
-  attrs  ProductAttr[]
+  @@map("product_categories")
+}
 
+model Product {
+  id         Int     @id @default(autoincrement())
+  categoryId Int?
+  parentId   Int?
+  name       String
+  prices     Price[]
+
+  category ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  parent   Product?         @relation("ProductParent", fields: [parentId], references: [id], onDelete: Cascade)
+  childs   Product[]        @relation("ProductParent")
+  attrs    ProductAttr[]
 
   @@index([name])
   @@map("products")
@@ -44,6 +53,13 @@ model ProductAttr {
   childs  ProductAttr[] @relation("ProductAttrParent")
 
   @@map("product_attrs")
+}
+
+model Specialization {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  @@map("specializations")
 }
 
 model Society {

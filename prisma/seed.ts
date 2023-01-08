@@ -68,9 +68,21 @@ const orgs: Prisma.OrgCreateManyInput[] = [
 ]
 
 
+const productCategories: Prisma.ProductCategoryCreateInput[] = [
+	{
+		name: 'Зерно'
+	},
+	{
+		name: 'Сельскохозяйственная техника'
+	}
+]
+
+
 const uniProducts: Prisma.ProductCreateInput[] = [
 	{
-		name: 'Пшеница', childs: {
+		name: 'Пшеница',
+		category: { connect: { id: 1 } },
+		childs: {
 			create: {
 				name: 'Протеин', childs: {
 					createMany: {
@@ -92,7 +104,9 @@ const uniProducts: Prisma.ProductCreateInput[] = [
 		}
 	},
 	{
-		name: 'Плуг чизельный', childs: {
+		name: 'Плуг чизельный',
+		category: { connect: { id: 2 } },
+		childs: {
 			createMany: {
 				data: [
 					{ name: 'ПЧН-2,3' },
@@ -215,6 +229,10 @@ const main = async () => {
 
 		await prisma.org.createMany({
 			data: orgs
+		})
+
+		await prisma.productCategory.createMany({
+			data: productCategories
 		})
 
 		for (const data of uniProducts)

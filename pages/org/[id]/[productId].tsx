@@ -24,6 +24,12 @@ const Card = () => {
                 <Link href={`/product/${item.parent.id}`}>{item.parent.name}</Link>
             </>
         }
+        {
+            !!item.category && <>
+                <i>Категория</i>
+                <span>{item.category.name}</span>
+            </>
+        }
         <i>Производитель</i>
         <Link href={`/org/${org?.id}`}>{org?.name}</Link>
         <i>Цена</i>

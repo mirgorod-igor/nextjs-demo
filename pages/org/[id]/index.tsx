@@ -29,6 +29,8 @@ const Card = () => {
                 <Link href={`/org/`+item.parent.id}>{item.parent.name}</Link>
             </>
         }
+        <i>Специализация</i>
+        <span>{item.name}</span>
         <i>Регион</i>
         <span>{item.region?.name}</span>
         <i>Юридический адрес</i>

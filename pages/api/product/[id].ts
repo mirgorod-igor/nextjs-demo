@@ -23,6 +23,9 @@ export default async function handler(
 
     const data = await prisma.product.findUnique({
         include: {
+            category: {
+                select: { id: true, name: true }
+            },
             prices: {
                 select: {
                     id: true, orgId: !orgId, price: true,

@@ -1,4 +1,4 @@
-import {Fragment, useEffect} from 'react'
+import {useEffect} from 'react'
 import {NextPage} from 'next'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
@@ -24,6 +24,12 @@ const Card = () => {
     return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
         <i>Наименование</i>
         <span>{item.name}</span>
+        {
+            !!item.category && <>
+                <i>Категория</i>
+                <span>{item.category.name}</span>
+            </>
+        }
         {
             item.parent && <>
                 <i>Группа</i>

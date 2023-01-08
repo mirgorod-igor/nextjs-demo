@@ -8,15 +8,15 @@ import sty from 'styles/list.module.sass'
 
 
 
-type Children<T> = (it: T & TreeItem<T>, level: number) => ReactNode
+type Children<T extends IdName> = (it: T & TreeItem<T>, level: number) => ReactNode
 
-interface TreeProps<T> {
+interface TreeProps<T extends IdName> {
     item: T & TreeItem<T>
     level: number
     children: Children<T>
 }
 
-const Tree = <T,>(p: TreeProps<T>) => {
+const Tree = <T extends IdName,>(p: TreeProps<T>) => {
     return p.item.childs ? <>
         <div style={{ textIndent: p.level * 40 + 'px' }}>{p.item.name}</div>
         {
@@ -28,12 +28,12 @@ const Tree = <T,>(p: TreeProps<T>) => {
 }
 
 
-type Props<T> = {
+type Props<T extends IdName> = {
     children: Children<T>
     store: store.PagedList<T>
 }
 
-const TreeList = <T extends TreeItem<T>,>(p: Props<T>) => {
+const TreeList = <T extends IdName & TreeItem<T>,>(p: Props<T>) => {
     const st = p.store.useStatus()
         , items = p.store.items
 
