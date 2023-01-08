@@ -91,33 +91,30 @@ export default async function handler(
 		// сначала ищем цены по orgId
 		const [ prices, total ] = await Promise.all([
 			prisma.price.findMany({
-				include: {
+				select: {
+					id: true, productId: true, price: true,
 					childs: {
 						select: {
-							org: {
-								select: {
-									id: true, name: true
-								},
-							},
-							id: true, price: true
+							id: true, orgId: true, price: true
 						}
 					}
 				},
 				skip, take,
-				where: { orgId }
+				where: { orgId, productId: { not: null } }
 			}),
 			prisma.price.count({
-				where: { orgId }
+				where: { orgId, productId: { not: null } }
 			})
 		])
 
 
-		const pricesWithProduct = prices.filter(it => !!it.productId)
+		console.log('prices', prices)
+
 		// собираем productId
 		const items = await loadRelationProducts(
-			pricesWithProduct.map(it => it.productId!),
+			prices.map(it => it.productId!),
 			undefined,
-			pricesWithProduct.reduce((res, it) => ((res[it.productId!] = {
+			prices.reduce((res, it) => ((res[it.productId!] = {
 				value: it.price, childs: it.childs
 			}), res), {})
 		)

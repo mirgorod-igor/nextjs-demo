@@ -23,10 +23,7 @@ const societies: Prisma.SocietyCreateManyInput[] = [
 
 const orgServices: Prisma.OrgServiceCreateInput[] = [
 	{
-		name: 'Перевалка зерна'
-	},
-	{
-		name: 'Перевалка масла'
+		name: 'Перевалка зерновых культур'
 	},
 	{
 		name: 'Производство'
@@ -53,7 +50,7 @@ const orgs: Prisma.OrgUncheckedCreateInput[] = [
 		societyId: 1,
 		name: 'Новороссийский Зерновой Терминал',
 		short: 'НЗТ CPT',
-		desc: 'Перевалка зерновых культур',
+		desc: 'Зерновой терминал',
 		regionId: 542415,
 		parentId: 1,
 		trade: 'w',
@@ -63,7 +60,7 @@ const orgs: Prisma.OrgUncheckedCreateInput[] = [
 		societyId: 1,
 		name: 'Таганрогский судоремонтный завод CPT',
 		short: 'ТСРЗ CPT',
-		desc: 'Перевалка зерновых культур',
+		desc: 'Зерновой терминал',
 		regionId: 501165,
 		parentId: 1,
 		trade: 'w',
@@ -73,7 +70,7 @@ const orgs: Prisma.OrgUncheckedCreateInput[] = [
 		societyId: 1,
 		name: 'Зерновой Терминальный комплекс Тамань',
 		short: 'ЗТКТ',
-		desc: 'Перевалка зерновых культур',
+		desc: 'Зерновой терминал',
 		regionId: 542415,
 		parentId: 1,
 		trade: 'w',
@@ -87,13 +84,30 @@ const orgs: Prisma.OrgUncheckedCreateInput[] = [
 		regionId: 567395,
 		trade: 'w',
 		legalAddr: 'ул.Красноармейская, д,72'
+	},
+	{
+		societyId: 3,
+		name: 'Объединение компаний «Алмаз»',
+		short: 'Алмаз',
+		desc: 'Машиностроительное предприятие',
+		regionId: 1511732,
+		legalAddr: 'ул. Северо-Западная, 2а'
+	},
+	{
+		societyId: 3,
+		parentId: 6,
+		name: 'Торговый дом «Алмаз»',
+		short: 'ТД «Алмаз»',
+		desc: 'Машиностроительное предприятие',
+		regionId: 1511732,
+		legalAddr: 'ул. Северо-Западная, 2а'
 	}
 ]
 
 
-const productCategories: Prisma.ProductCategoryCreateInput[] = [
+const productGroups: Prisma.ProductGroupCreateInput[] = [
 	{
-		name: 'Зерно'
+		name: 'Зерновые культуры'
 	},
 	{
 		name: 'Сельскохозяйственная техника'
@@ -101,12 +115,10 @@ const productCategories: Prisma.ProductCategoryCreateInput[] = [
 ]
 
 
-const uniProducts: Prisma.ProductCreateInput[] = [
+const uniProducts: Prisma.ProductUncheckedCreateInput[] = [
 	{
 		name: 'Пшеница',
-		category: {
-			connect: { id: 1 }
-		},
+		groupId: 1,
 		childs: {
 			create: {
 				name: 'Протеин', childs: {
@@ -129,16 +141,36 @@ const uniProducts: Prisma.ProductCreateInput[] = [
 		}
 	},
 	{
+		name: 'Перевалка зерна',
+		groupId: 1,
+		isService: true,
+		unit: 'ton'
+	},
+	{
+		name: 'Перевалка масла',
+		groupId: 1,
+		isService: true,
+		unit: 'ton'
+	},
+	{
+		name: 'Услуги буксира',
+		groupId: 1,
+		isService: true,
+		unit: 'ton'
+	},
+	{
 		name: 'Плуг чизельный',
-		category: {
-			connect: { id: 2 }
-		},
+		groupId: 2,
 		childs: {
 			createMany: {
 				data: [
 					{ name: 'ПЧН-2,3' },
 					{ name: 'ПЧН-3,2' },
 					{ name: 'ПЧН-4,5' },
+					{ name: 'SVAROG ПЧ-2,5' },
+					{ name: 'SVAROG ПЧ-4,5' },
+					{ name: 'SVAROG ПЧП-4,5' },
+					{ name: 'SVAROG ПЧ-6' },
 				]
 			}
 		}
@@ -202,11 +234,31 @@ const productsPrices: Record<number, [string?, number?, number?][]> = {
 		['ПЧН-2,3', 18000],
 		['ПЧН-3,2', 21000],
 		['ПЧН-4,5', 24000],
+	],
+	7: [
+		['SVAROG ПЧ-2,5', 19000],
+		['SVAROG ПЧ-4,5', 26000],
+		['SVAROG ПЧП-4,5', 30000],
+		['SVAROG ПЧ-6', 41000],
 	]
 }
 
 
-
+const tonPrices: Record<number, [string?, number?, number?][]> = {
+	2: [
+		['Перевалка зерна', 1500],
+		['Перевалка масла', 1017]
+	],
+	3: [
+		['Перевалка зерна', 1600],
+		['Перевалка масла', 1200],
+		['Услуги буксира', 200],
+	],
+	4: [
+		['Перевалка зерна', 1400],
+		['Перевалка масла', 960 ]
+	]
+}
 
 
 
@@ -227,10 +279,10 @@ const readRegions = (resolve: (value: Region[]) => void) =>
 
 
 
-const createPrices = async (orgs: number[]) => {
+const createPrices = async (orgs: number[], prices = productsPrices) => {
 	const prods: Record<string, any> = {}
 	for (const orgId of orgs)
-		for (const [name, price, parentId] of productsPrices[orgId]) {
+		for (const [name, price, parentId] of prices[orgId]) {
 
 			if (name && !prods[name]) {
 				const p = await prisma.product.findFirst({
@@ -254,7 +306,7 @@ const main = async () => {
 
 	try {
 		await prisma.$executeRaw`SET foreign_key_checks = 0`
-		const tables = ['prices', 'products', 'product_categories', 'product_attrs', 'orgs', 'org_services', 'regions', 'societies']
+		const tables = ['prices', 'products', 'product_groups', 'product_attrs', 'orgs', 'org_services', 'regions', 'societies']
 		for (const table of tables) {
 			await prisma.$executeRawUnsafe(`truncate table ${table}`)
 		}
@@ -275,8 +327,8 @@ const main = async () => {
 		for (const data of orgs)
 			await prisma.org.create({ data })
 
-		await prisma.productCategory.createMany({
-			data: productCategories
+		await prisma.productGroup.createMany({
+			data: productGroups
 		})
 
 		for (const data of uniProducts)
@@ -286,6 +338,9 @@ const main = async () => {
 		await createPrices([1])
 		await createPrices([2, 3, 4])
 		await createPrices([5])
+		await createPrices([7])
+		await createPrices([2, 3, 4], tonPrices)
+
 	}
 	finally {
 		await prisma.$disconnect()

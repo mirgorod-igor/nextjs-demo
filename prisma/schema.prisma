@@ -16,25 +16,27 @@ model Region {
   @@map("regions")
 }
 
-model ProductCategory {
+model ProductGroup {
   id       Int       @id @default(autoincrement())
   name     String
   products Product[]
 
-  @@map("product_categories")
+  @@map("product_groups")
 }
 
 model Product {
-  id         Int     @id @default(autoincrement())
-  categoryId Int?
-  parentId   Int?
-  name       String
-  prices     Price[]
+  id        Int         @id @default(autoincrement())
+  groupId   Int?
+  parentId  Int?
+  name      String
+  isService Boolean     @db.Bit(1) @default(false)
+  unit      ProductUnit @default(it)
 
-  category ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  parent   Product?         @relation("ProductParent", fields: [parentId], references: [id], onDelete: Cascade)
-  childs   Product[]        @relation("ProductParent")
-  attrs    ProductAttr[]
+  prices Price[]
+  group  ProductGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  parent Product?      @relation("ProductParent", fields: [parentId], references: [id], onDelete: Cascade)
+  childs Product[]     @relation("ProductParent")
+  attrs  ProductAttr[]
 
   @@index([name])
   @@map("products")
@@ -115,6 +117,11 @@ model Price {
 
   @@unique([productId, orgId])
   @@map("prices")
+}
+
+enum ProductUnit {
+  ton
+  it
 }
 
 enum Trade {

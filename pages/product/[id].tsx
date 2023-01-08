@@ -25,9 +25,9 @@ const Card = () => {
         <i>Наименование</i>
         <span>{item.name}</span>
         {
-            !!item.category && <>
+            !!item.group && <>
                 <i>Категория</i>
-                <span>{item.category.name}</span>
+                <span>{item.group.name}</span>
             </>
         }
         {
@@ -50,6 +50,7 @@ const Card = () => {
         }
     </div>
 }
+
 
 
 const removeStores: Record<number, store.Remove> = {}

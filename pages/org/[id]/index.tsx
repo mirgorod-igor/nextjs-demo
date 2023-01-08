@@ -1,4 +1,4 @@
-import {Fragment, useEffect} from 'react'
+import {useEffect} from 'react'
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
@@ -7,12 +7,15 @@ import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
 
-import {TabButtons, TreeList} from 'components'
+import {RemoveToggler, TabButtons, TreeList} from 'components'
 
 
+import {RemoveItem} from 'stores'
 import {view, products} from 'stores/view/org'
 
+
 import sty from 'styles/view.module.sass'
+
 
 
 
@@ -29,7 +32,7 @@ const Card = () => {
                 <Link href={`/org/`+item.parent.id}>{item.parent.name}</Link>
             </>
         }
-        <i>Специализация</i>
+        <i>Описание</i>
         <span>{item.desc}</span>
         <i>Регион</i>
         <span>{item.region?.name}</span>
@@ -60,25 +63,39 @@ const tab = atom<TabId>('prices')
 
 
 
+const removeStores: Record<number, store.Remove> = {}
+const getRemove = (id: number) =>
+    removeStores[id] || (removeStores[id] = new RemoveItem('price', id))
+
+
 
 const TabContent = (p: { orgId: number }) => {
     const t = useStore(tab)
+        , st = view.useStatus()
+        , orgs = view.data.childs
+        , orgMap: Record<number, string> = {}
+
+
+    if (st == 'ok' && orgs) {
+        for (const {id, name} of orgs)
+            orgMap[id] = name
+    }
 
     return t == 'prices'
-        ? <TreeList store={products}>{
+        ? <TreeList store={products} status={st}>{
             (it, level) => <div
                 key={it.id}
-                style={{ textIndent: level * 40 + 'px' }}
                 className={it.prices ? sty.prices : sty.price}
+                style={{ textIndent: level * 40 + 'px' }}
             >
                 <Link href={`${p.orgId}/${it.id}`}>{it.name}</Link>
                 {
-                    !!it.price
+                    it.price
                         ? <b>{it.price}</b>
-                        : it.prices?.map(it => <Fragment key={it.id}>
-                            <span>{it.org?.name}</span>
+                        : it.prices?.map(it => <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)} style={{ textIndent: level * 80 + 'px' }}>
+                            <span>{orgMap[it.orgId!]}</span>
                             <b>{it.price}</b>
-                        </Fragment>)
+                        </RemoveToggler>)
                 }
             </div>
         }</TreeList>

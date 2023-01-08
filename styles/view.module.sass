@@ -70,18 +70,23 @@
 
 .prices
     font-size: 0.9rem
-    display: grid
-    grid-template-columns: auto auto auto
+    align-items: start !important
+    flex-flow: column
     row-gap: 8px
 
-    > a
-        grid-column: span 3
+    > div
+        display: flex
+        justify-content: space-between
+        column-gap: 8px
+        width: 100%
 
-    > span
-        grid-column: 2
-    > b
-        grid-column: 3
-        justify-self: center
+        > span
+            flex: 3
+        > b
+            flex: 1
+            justify-self: center
+        > label
+            text-indent: 0
 
 
 

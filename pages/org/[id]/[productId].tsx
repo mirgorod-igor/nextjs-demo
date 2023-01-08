@@ -12,6 +12,7 @@ import {useStore} from '@nanostores/react'
 
 
 
+
 const Card = () => {
     const st = product.useStatus()
         , item = product.data
@@ -28,9 +29,9 @@ const Card = () => {
             </>
         }
         {
-            !!item.category && <>
+            !!item.group && <>
                 <i>Категория</i>
-                <span>{item.category.name}</span>
+                <span>{item.group.name}</span>
             </>
         }
         <i>Производитель</i>
@@ -54,6 +55,7 @@ const tab = atom<TabId>('prices')
 
 
 
+
 const TabContent = () => {
     const t = useStore(tab)
         , st = product.useStatus()
@@ -63,7 +65,7 @@ const TabContent = () => {
             ? <div className={sty.prices}>
                 {product.data.prices?.[0].childs?.map(it =>
                     <Fragment key={it.id}>
-                        <span><Link href={`/org/${it.org?.id}`}>{it.org?.name}</Link></span>
+                        <span><Link href={`/org/${it.orgId}`}>{it.orgId}</Link></span>
                         <b>{it.price}</b>
                     </Fragment>
                 )}
