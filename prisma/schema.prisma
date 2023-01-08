@@ -24,19 +24,28 @@ model ProductGroup {
   @@map("product_groups")
 }
 
-model Product {
-  id        Int         @id @default(autoincrement())
-  groupId   Int?
-  parentId  Int?
-  name      String
-  isService Boolean     @db.Bit(1) @default(false)
-  unit      ProductUnit @default(it)
+model ProductCategory {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
 
-  prices Price[]
-  group  ProductGroup? @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  parent Product?      @relation("ProductParent", fields: [parentId], references: [id], onDelete: Cascade)
-  childs Product[]     @relation("ProductParent")
-  attrs  ProductAttr[]
+  @@map("product_categories")
+}
+
+model Product {
+  id       Int         @id @default(autoincrement())
+  groupId  Int?
+  parentId Int?
+  name     String
+  catId    Int?
+  unit     ProductUnit @default(it)
+
+  prices   Price[]
+  category ProductCategory? @relation(fields: [catId], references: [id], onDelete: Cascade)
+  group    ProductGroup?    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  parent   Product?         @relation("ProductParent", fields: [parentId], references: [id], onDelete: Cascade)
+  childs   Product[]        @relation("ProductParent")
+  attrs    ProductAttr[]
 
   @@index([name])
   @@map("products")

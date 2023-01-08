@@ -6,13 +6,14 @@ import {useRouter} from 'next/router'
 import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
-import {RemoveToggler, TabButtons} from 'components'
+import {List, RemoveToggler, TabButtons, Tree, TreeList} from 'components'
 
 import {orgMap, orgs, product} from 'stores/view/product'
 
 import {RemoveItem} from 'stores'
 
 import sty from 'styles/view.module.sass'
+import {products, view} from 'stores/view/org'
 
 
 
@@ -22,7 +23,7 @@ const Card = () => {
         , item = product.data ?? {}
 
     return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
-        <i>Наименование</i>
+        <i>{item.category?.name ?? 'Наименование'}</i>
         <span>{item.name}</span>
         {
             !!item.group && <>
@@ -71,16 +72,42 @@ const tab = atom<TabId>('prices')
 
 const Prices = () => {
     const st = product.useStatus()
-        , item = product.data
+        , {childs, prices} = product.data
         , ost = orgs.useStatus()
         , wait = ost == 'wait' || st == 'wait' ? ' '+sty.wait : ''
+        , orgMap: Record<number, string> = {}
+
+
+    if (ost == 'ok') {
+        for (const {id, name} of orgs.items)
+            orgMap[id] = name
+    }
 
     return <div className={sty.list + wait}>
         {
-            item.prices?.map(it => <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
-                <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>
-                <span>{it.price}</span>
-            </RemoveToggler>)
+            childs?.map(it =>
+                it.prices?.map(it =>
+                    <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
+                        <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>
+                        <b>{it.price}</b>
+                    </RemoveToggler>
+                )
+            )
+        }
+        {
+            prices?.map(it =>
+                it.childs?.length
+                    ? it.childs.map(it =>
+                        <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
+                            <Link href={`/org/${it.org?.id}`}>{it.org?.name}</Link>
+                            <b>{it.price}</b>
+                        </RemoveToggler>
+                    )
+                    : <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
+                        <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>
+                        <b>{it.price}</b>
+                    </RemoveToggler>
+            )
         }
     </div>
 }

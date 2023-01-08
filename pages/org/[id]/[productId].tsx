@@ -1,14 +1,18 @@
-import {Fragment, useEffect} from 'react'
+import {useEffect} from 'react'
 import {NextPage} from 'next'
 import Link from 'next/link'
 import {useRouter} from 'next/router'
 
+import {useStore} from '@nanostores/react'
+import {atom} from 'nanostores'
+
+import {RemoveToggler, TabButtons, Tree, TreeList} from 'components'
+
 import {orgs, product} from 'stores/view/product'
+import {RemoveItem} from 'stores'
 
 import sty from 'styles/view.module.sass'
-import {atom} from 'nanostores'
-import {TabButtons} from 'components'
-import {useStore} from '@nanostores/react'
+import {products} from 'stores/view/org'
 
 
 
@@ -20,7 +24,7 @@ const Card = () => {
         , wait = st == 'wait' ? ' '+sty.wait : ''
 
     return <div className={sty.card + wait}>
-        <i>Наименование</i>
+        <i>{item.category?.name ?? 'Наименование'}</i>
         <Link href={`/product/${item.id}`}>{item.name}</Link>
         {
             !!item.parent && <>
@@ -46,6 +50,14 @@ const Card = () => {
 }
 
 
+const removeStores: Record<number, store.Remove> = {}
+
+const getRemove = (id: number) =>
+    removeStores[id] || (removeStores[id] = new RemoveItem('price', id))
+
+
+
+
 type TabId = 'prices' | 'sales'
 const tabs: [TabId, string, boolean?][] = [
     ['prices', 'Цены', true],
@@ -54,33 +66,31 @@ const tabs: [TabId, string, boolean?][] = [
 const tab = atom<TabId>('prices')
 
 
-
-
-const TabContent = () => {
-    const t = useStore(tab)
-        , st = product.useStatus()
-
-    return st == 'ok'
-        ? t == 'prices'
-            ? <div className={sty.prices}>
-                {product.data.prices?.[0].childs?.map(it =>
-                    <Fragment key={it.id}>
-                        <span><Link href={`/org/${it.orgId}`}>{it.orgId}</Link></span>
-                        <b>{it.price}</b>
-                    </Fragment>
-                )}
-            </div>
-            : <div></div>
-        : <></>
-}
-
-const Details = () => {
+const Prices = () => {
     const st = product.useStatus()
         , ost = orgs.useStatus()
         , wait = st == 'wait' || ost == 'wait' ? ' ' + sty.wait : ''
 
-    return <div className={sty.details + wait}>
-        <TabButtons state={tab} items={product.data.prices?.[0].childs?.length ? tabs : tabs.slice(1)} />
+    return <div className={sty.list + wait}>
+        {product.data.prices?.[0]?.childs?.map(it =>
+            <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
+                <span><Link href={`/org/${it.org?.id}`}>{it.org?.name}</Link></span>
+                <b>{it.price}</b>
+            </RemoveToggler>
+        )}
+    </div>
+}
+
+const TabContent = () => {
+    const t = useStore(tab)
+
+    return t == 'prices' ? <Prices /> : <div></div>
+}
+
+const Details = () => {
+
+    return <div className={sty.details}>
+        <TabButtons state={tab} items={product.data.prices?.[0]?.childs?.length ? tabs : tabs.slice(1)} />
         <div className={sty.content}>
             <TabContent />
         </div>

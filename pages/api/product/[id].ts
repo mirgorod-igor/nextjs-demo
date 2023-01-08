@@ -23,26 +23,47 @@ export default async function handler(
 
     const data = await prisma.product.findUnique({
         include: {
+            category: {
+                select: { id: true, name: true }
+            },
             group: {
                 select: { id: true, name: true }
             },
             prices: {
                 select: {
                     id: true, orgId: !orgId, price: true,
-                    org: !!orgId ? { select: { id: true, name: true } } : false,
+                    org: !!orgId
+                        ? { select: { id: true, name: true } }
+                        : false,
                     childs: {
                         select: {
-                            id: true, org: { select: { id: true, name: true } }, price: true
+                            id: true, price: true,
+                            org: { select: { id: true, name: true } }
+                        },
+                        where: {
+                            price: { not: null }
                         }
                     }
                 },
-                where: orgId ? { orgId } : undefined
+                where: {
+                    orgId: orgId ?? undefined,
+                }
             },
             parent: {
                 select: { id: true, name: true }
             },
             childs: {
-                select: { id: true, name: true }
+                select: {
+                    id: true, name: true,
+                    prices: {
+                        select: {
+                            id: true, orgId: true, price: true
+                        },
+                        where: {
+                            price: { not: null }
+                        }
+                    }
+                }
             }
         },
         where: { id }

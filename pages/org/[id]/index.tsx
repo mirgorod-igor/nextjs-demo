@@ -82,24 +82,31 @@ const TabContent = (p: { orgId: number }) => {
     }
 
     return t == 'prices'
-        ? <TreeList store={products} status={st}>{
-            (it, level) => <div
-                key={it.id}
-                className={it.prices ? sty.prices : sty.price}
-                style={{ textIndent: level * 40 + 'px' }}
-            >
-                <Link href={`${p.orgId}/${it.id}`}>{it.name}</Link>
-                {
-                    it.price
-                        ? <b>{it.price}</b>
-                        : it.prices?.map(it => <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)} style={{ textIndent: level * 80 + 'px' }}>
-                            <span>{orgMap[it.orgId!]}</span>
-                            <b>{it.price}</b>
-                        </RemoveToggler>)
-                }
-            </div>
-        }</TreeList>
-        : <></>
+        ? <TreeList store={products} status={st}>
+            {(it, level) => it.prices
+                ? <div
+                    key={it.id}
+                    className={it.prices ? sty.prices : sty.price}
+                >
+                    <Link href={`${p.orgId}/${it.id}`} style={{ textIndent: level * 40 + 'px' }}>{it.name}</Link>
+                    {
+                        it.price
+                            ? <b>{it.price}</b>
+                            : it.prices?.map(it => <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)} style={{ textIndent: level * 80 + 'px' }}>
+                                <span>{orgMap[it.orgId!]}</span>
+                                <b>{it.price}</b>
+                            </RemoveToggler>)
+                    }
+                </div>
+                : it.price
+                    ? <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
+                        <Link href={`${p.orgId}/${it.id}`} style={{ textIndent: level * 80 + 'px' }}>{it.name}</Link>
+                        <b>{it.price}</b>
+                    </RemoveToggler>
+                    : <></>
+            }</TreeList>
+            : <></>
+
 }
 
 const Details = (p: { orgId: number }) => {

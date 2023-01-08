@@ -19,6 +19,7 @@ interface Price extends Id {
 }
 
 interface Product extends IdName, TreeItem<Product> {
+    category?: IdName
     group?: IdName
     price?: number
     prices?: Price[]

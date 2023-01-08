@@ -114,6 +114,15 @@ const productGroups: Prisma.ProductGroupCreateInput[] = [
 	}
 ]
 
+const productCategories: Prisma.ProductCategoryCreateInput[] = [
+	{
+		name: 'Оборудование'
+	},
+	{
+		name: 'Услуга'
+	}
+]
+
 
 const uniProducts: Prisma.ProductUncheckedCreateInput[] = [
 	{
@@ -142,20 +151,20 @@ const uniProducts: Prisma.ProductUncheckedCreateInput[] = [
 	},
 	{
 		name: 'Перевалка зерна',
+		catId: 2,
 		groupId: 1,
-		isService: true,
 		unit: 'ton'
 	},
 	{
 		name: 'Перевалка масла',
+		catId: 2,
 		groupId: 1,
-		isService: true,
 		unit: 'ton'
 	},
 	{
 		name: 'Услуги буксира',
+		catId: 2,
 		groupId: 1,
-		isService: true,
 		unit: 'ton'
 	},
 	{
@@ -164,13 +173,13 @@ const uniProducts: Prisma.ProductUncheckedCreateInput[] = [
 		childs: {
 			createMany: {
 				data: [
-					{ name: 'ПЧН-2,3' },
-					{ name: 'ПЧН-3,2' },
-					{ name: 'ПЧН-4,5' },
-					{ name: 'SVAROG ПЧ-2,5' },
-					{ name: 'SVAROG ПЧ-4,5' },
-					{ name: 'SVAROG ПЧП-4,5' },
-					{ name: 'SVAROG ПЧ-6' },
+					{ catId: 1, name: 'ПЧН-2,3' },
+					{ catId: 1, name: 'ПЧН-3,2' },
+					{ catId: 1, name: 'ПЧН-4,5' },
+					{ catId: 1, name: 'SVAROG ПЧ-2,5' },
+					{ catId: 1, name: 'SVAROG ПЧ-4,5' },
+					{ catId: 1, name: 'SVAROG ПЧП-4,5' },
+					{ catId: 1, name: 'SVAROG ПЧ-6' },
 				]
 			}
 		}
@@ -329,6 +338,10 @@ const main = async () => {
 
 		await prisma.productGroup.createMany({
 			data: productGroups
+		})
+
+		await prisma.productCategory.createMany({
+			data: productCategories
 		})
 
 		for (const data of uniProducts)

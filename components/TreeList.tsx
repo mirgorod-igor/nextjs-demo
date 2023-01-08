@@ -13,7 +13,7 @@ interface TreeProps<T extends IdName> {
     children: Children<T>
 }
 
-const Tree = <T extends IdName,>(p: TreeProps<T>) => {
+export const Tree = <T extends IdName,>(p: TreeProps<T>) => {
     return p.item.childs
         ? <>
             <div style={{ textIndent: p.level * 40 + 'px' }}>{p.item.name}</div>

@@ -6,7 +6,7 @@ export {default as Pagination} from './Pagination'
 export {default as RemoveToggler} from './RemoveToggler'
 export {default as Select} from './Select'
 
-export {default as TreeList} from './TreeList'
+export {default as TreeList, Tree} from './TreeList'
 export {default as OrgList} from './OrgList'
 
 
