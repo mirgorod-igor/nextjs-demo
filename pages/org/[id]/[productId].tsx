@@ -6,7 +6,7 @@ import {useRouter} from 'next/router'
 import {useStore} from '@nanostores/react'
 import {atom} from 'nanostores'
 
-import {TabButtons, Tree, Prices} from 'components'
+import {TabButtons, Tree, Prices, Breadcrumbs} from 'components'
 
 import {orgMap, orgs, product} from 'stores/view/product'
 import {RemoveItem} from 'stores'
@@ -15,6 +15,17 @@ import sty from 'styles/view.module.sass'
 
 
 
+const breadcrumbs: [string, string][] = [
+    ['/', 'главная']
+]
+
+const BC = (p: { orgId: number }) => {
+    const ready = orgs.useStatus()
+
+    return <Breadcrumbs
+        items={ready ? [...breadcrumbs, [`/org/${p.orgId}`, orgMap[p.orgId]]]  : breadcrumbs}
+    />
+}
 
 
 const Card = () => {
@@ -145,6 +156,7 @@ const ProductPage: NextPage = () => {
     }, [orgId])
 
     return <main className={sty.main}>
+        <BC orgId={orgId} />
         <Card />
         <Details />
     </main>

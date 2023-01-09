@@ -6,7 +6,7 @@ import {useRouter} from 'next/router'
 import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
-import {Prices, PriceList, TabButtons, Tree} from 'components'
+import {Prices, PriceList, TabButtons, Tree, Breadcrumbs} from 'components'
 
 import {orgs, product} from 'stores/view/product'
 
@@ -16,6 +16,9 @@ import sty from 'styles/view.module.sass'
 
 
 
+const breadcrumbs: [string, string][] = [
+    ['/', 'главная']
+]
 
 
 
@@ -131,6 +134,7 @@ const ProductPage: NextPage = () => {
     }, [id])
 
     return <main className={sty.main}>
+        <Breadcrumbs items={breadcrumbs} />
         <Card />
         <Details />
     </main>

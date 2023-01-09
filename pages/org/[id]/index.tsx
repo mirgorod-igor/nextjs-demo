@@ -7,7 +7,7 @@ import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
 
-import {PriceList, TabButtons, TreeList} from 'components'
+import {Breadcrumbs, PriceList, TabButtons, TreeList} from 'components'
 
 
 import {RemoveItem} from 'stores'
@@ -18,6 +18,9 @@ import sty from 'styles/view.module.sass'
 
 
 
+const breadcrumbs: [string, string][] = [
+    ['/', 'главная']
+]
 
 
 const Card = () => {
@@ -30,7 +33,7 @@ const Card = () => {
         {
             item.parent && <>
                 <i>Головная компания</i>
-                <Link href={`/org/`+item.parent.id}>{item.parent.name}</Link>
+                <Link href={`/org/${item.parent.id}`}>{item.parent.name}</Link>
             </>
         }
         <i>Описание</i>
@@ -126,6 +129,7 @@ const OrgPage: NextPage = () => {
     }, [id])
 
     return <main className={sty.main}>
+        <Breadcrumbs items={breadcrumbs} />
         <Card />
         <Details orgId={id} />
     </main>

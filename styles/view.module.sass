@@ -2,11 +2,18 @@
 @use 'list.module'
 
 
+
 .main
-    display: flex
+    display: grid
+    grid-template-columns: auto auto
+    grid-template-rows: auto minmax(0, 1fr)
+
     gap: 16px
     width: 80%
     margin: auto
+
+    > nav
+        grid-column: span 2
 
     > div
         position: relative

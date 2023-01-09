@@ -46,6 +46,16 @@ input, select
 
 
 
+
+.breakcrumbs
+	display: flex
+	> a
+		font-size: 0.8rem
+		cursor: pointer
+		&:not(:last-of-type):after
+			content: '\00A0/\00A0'
+
+
 @media screen and (max-width: 1600px)
 	#__next
 		padding: 2rem 0
