@@ -16,14 +16,17 @@ interface TreeProps<T extends IdName> {
 export const Tree = <T extends IdName,>(p: TreeProps<T>) => {
     return p.item.childs
         ? <>
-            <div style={{ textIndent: p.level * 40 + 'px' }}>{p.item.name}</div>
+            <div className={sty.header}>
+                {new Array(p.level).fill(<u/>)}
+                <span>{p.item.name}</span>
+            </div>
             {
                 p.item.childs.map(it =>
                     <Tree key={it.id} item={it} children={p.children} level={p.level + 1} />
                 )
             }
         </>
-        : p.children(p.item, p.level??0)
+        : p.children(p.item, p.level)
 }
 
 
@@ -35,7 +38,7 @@ type Props<T extends IdName> = {
 
 const TreeList = <T extends IdName & TreeItem<T>,>(p: Props<T>) => {
     const st = p.store.useStatus()
-        , items = p.store.items
+        , {items} = p.store
 
     const wait = st == 'wait' || p.status == 'wait' ? ' '+sty.wait : ''
 

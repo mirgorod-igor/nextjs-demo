@@ -6,23 +6,25 @@ import {useRouter} from 'next/router'
 import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
-import {List, RemoveToggler, TabButtons, Tree, TreeList} from 'components'
+import {Prices, PriceList, TabButtons, Tree} from 'components'
 
-import {orgMap, orgs, product} from 'stores/view/product'
+import {orgs, product} from 'stores/view/product'
 
 import {RemoveItem} from 'stores'
 
 import sty from 'styles/view.module.sass'
-import {products, view} from 'stores/view/org'
+
+
 
 
 
 
 const Card = () => {
     const st = product.useStatus()
+        , wait = st == 'wait' ? ' '+sty.wait : ''
         , item = product.data ?? {}
 
-    return <div className={sty.card + ' ' + (st == 'wait' ? sty.wait : '')}>
+    return <div className={sty.card + wait}>
         <i>{item.category?.name ?? 'Наименование'}</i>
         <span>{item.name}</span>
         {
@@ -37,18 +39,6 @@ const Card = () => {
                 <Link href={`${item.parent.id}`}>{item.parent.name}</Link>
             </>
         }
-        {
-            !!item.childs?.length && <>
-                <i>Разновидности</i>
-                {
-                    <ul>
-                        {
-                            item.childs?.map(it => <Link href={''+it.id}>{it.name}</Link>)
-                        }
-                    </ul>
-                }
-            </>
-        }
     </div>
 }
 
@@ -56,7 +46,7 @@ const Card = () => {
 
 const removeStores: Record<number, store.Remove> = {}
 
-const getRemove = (id: number) =>
+const removeStoreFactory = (id: number) =>
     removeStores[id] || (removeStores[id] = new RemoveItem('price', id))
 
 
@@ -70,7 +60,7 @@ const tabs: [TabId, string, boolean?][] = [
 const tab = atom<TabId>('prices')
 
 
-const Prices = () => {
+const _Prices = () => {
     const st = product.useStatus()
         , {childs, prices} = product.data
         , ost = orgs.useStatus()
@@ -86,43 +76,43 @@ const Prices = () => {
     return <div className={sty.list + wait}>
         {
             childs?.map(it =>
-                it.prices?.map(it =>
-                    <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
-                        <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>
-                        <b>{it.price}</b>
-                    </RemoveToggler>
-                )
+                <Tree item={it} level={0}>
+                    {
+                        (it, level) =>
+                            <PriceList key={it.id} level={level} href={`${it.id}`} it={it} removeStoreFactory={removeStoreFactory}>
+                                {it => <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>}
+                            </PriceList>
+                    }
+                </Tree>
             )
         }
         {
-            prices?.map(it =>
-                it.childs?.length
-                    ? it.childs.map(it =>
-                        <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
-                            <Link href={`/org/${it.org?.id}`}>{it.org?.name}</Link>
-                            <b>{it.price}</b>
-                        </RemoveToggler>
-                    )
-                    : <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
-                        <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>
-                        <b>{it.price}</b>
-                    </RemoveToggler>
-            )
+            prices &&
+                <div className={sty.prices}>
+                    <Prices items={prices!} level={-1} removeStoreFactory={removeStoreFactory}>
+                        {it => <Link href={`/org/${it.org?.id}`}>{it.org?.name}</Link>}
+                    </Prices>
+                </div>
         }
     </div>
 }
 
+
 const TabContent = () => {
     const t = useStore(tab)
 
-    return t == 'prices' ? <Prices /> : <div></div>
+    return t == 'prices'
+        ? <_Prices />
+        : <div></div>
 }
 
 const Details = () => {
 
     return <div className={sty.details}>
         <TabButtons items={tabs} state={tab} />
-        <TabContent />
+        <div className={sty.content}>
+            <TabContent />
+        </div>
     </div>
 }
 

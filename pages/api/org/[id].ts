@@ -38,8 +38,6 @@ export default async function handler(
 
     const status: api.Status = 'ok'
 
-    await sleep()
-
     console.log('org', data)
 
     res.json({ status, data })

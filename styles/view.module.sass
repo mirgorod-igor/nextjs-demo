@@ -59,13 +59,23 @@
         height: calc(100% - 50px)
         margin-top: 16px
 
-
-.price
-    display: flex
-    > a
-        flex: 3
-    > b
+.item
+    > div
+        display: flex
+        column-gap: 8px
         flex: 1
+        > u
+            flex: 0 0 5%
+        > a
+            width: fit-content
+            &:last-of-type
+                flex: 2
+            &:first-of-type
+                flex: 4
+        > b
+            flex: 1
+            justify-self: end
+
 
 
 .prices
@@ -80,13 +90,22 @@
         column-gap: 8px
         width: 100%
 
+        > u
+            flex: 0 0 5%
+        > a
+            width: fit-content
+            &:last-of-type
+                flex: 2
+            &:first-of-type
+                flex: 4
+        > div
+            flex: 1
+
         > span
             flex: 3
         > b
             flex: 1
-            justify-self: center
-        > label
-            text-indent: 0
+            justify-self: end
 
 
 

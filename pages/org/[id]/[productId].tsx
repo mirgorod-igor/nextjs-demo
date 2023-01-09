@@ -6,13 +6,13 @@ import {useRouter} from 'next/router'
 import {useStore} from '@nanostores/react'
 import {atom} from 'nanostores'
 
-import {RemoveToggler, TabButtons, Tree, TreeList} from 'components'
+import {TabButtons, Tree, Prices} from 'components'
 
-import {orgs, product} from 'stores/view/product'
+import {orgMap, orgs, product} from 'stores/view/product'
 import {RemoveItem} from 'stores'
 
 import sty from 'styles/view.module.sass'
-import {products} from 'stores/view/org'
+
 
 
 
@@ -66,31 +66,63 @@ const tabs: [TabId, string, boolean?][] = [
 const tab = atom<TabId>('prices')
 
 
-const Prices = () => {
+const PriceList = () => {
     const st = product.useStatus()
         , ost = orgs.useStatus()
+        , {childs, prices} = product.data
         , wait = st == 'wait' || ost == 'wait' ? ' ' + sty.wait : ''
 
+    const onePrice = (prices?.length ?? 0) == 1 && !!prices![0].price
+
     return <div className={sty.list + wait}>
-        {product.data.prices?.[0]?.childs?.map(it =>
-            <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
-                <span><Link href={`/org/${it.org?.id}`}>{it.org?.name}</Link></span>
-                <b>{it.price}</b>
-            </RemoveToggler>
-        )}
+        {
+            childs?.map(it =>
+                <Tree key={it.id} item={it} level={0}>
+                    {
+                        (prod, level) => <div className={sty.prices}>
+                            <Prices
+                                level={level}
+                                items={prod.prices!}
+                                removeStoreFactory={getRemove}
+                            >
+                                {
+                                    pr => <>
+                                        <Link href={`/org/${pr.orgId}`}>{orgMap[pr.orgId!]}</Link>
+                                        <Link href={`/org/${pr.orgId}/${prod.id}`}>{prod.name}</Link>
+                                    </>
+                                }
+                            </Prices>
+                        </div>
+                    }
+                </Tree>
+            )
+        }
+        {
+            !onePrice && <div className={sty.prices}>
+                <Prices
+                    level={-1}
+                    items={product.data.prices!}
+                    removeStoreFactory={getRemove}
+                >
+                    {pr => <Link href={`/org/${pr.org?.id}`}>{pr.org?.name}</Link>}
+                </Prices>
+            </div>
+        }
     </div>
 }
 
 const TabContent = () => {
     const t = useStore(tab)
 
-    return t == 'prices' ? <Prices /> : <div></div>
+    return t == 'prices' ? <PriceList /> : <div></div>
 }
 
 const Details = () => {
+    const onePrice = (product.data.prices?.length ?? 0) == 1 && !!product.data.prices![0].price
+        , items = product.useStatus() == 'wait' ? [] : onePrice ? tabs.slice(1) : tabs
 
     return <div className={sty.details}>
-        <TabButtons state={tab} items={product.data.prices?.[0]?.childs?.length ? tabs : tabs.slice(1)} />
+        <TabButtons state={tab} items={items} />
         <div className={sty.content}>
             <TabContent />
         </div>

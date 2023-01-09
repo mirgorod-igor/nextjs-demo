@@ -37,12 +37,15 @@
 		align-items: center
 		position: relative
 		column-gap: 8px
-		> *:not(:last-child)
-			flex: 1
+		> u
+			flex: 0 0 5%
 		// удаление
 		:global(._T_)
 			@extend .remove-toggler
 
+	.header
+		span
+			flex: 4
 
 	&.wait
 		&:after

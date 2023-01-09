@@ -7,7 +7,7 @@ import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
 
-import {RemoveToggler, TabButtons, TreeList} from 'components'
+import {PriceList, TabButtons, TreeList} from 'components'
 
 
 import {RemoveItem} from 'stores'
@@ -15,6 +15,7 @@ import {view, products} from 'stores/view/org'
 
 
 import sty from 'styles/view.module.sass'
+
 
 
 
@@ -68,12 +69,11 @@ const getRemove = (id: number) =>
     removeStores[id] || (removeStores[id] = new RemoveItem('price', id))
 
 
-
+const orgMap: Record<number, string> = {}
 const TabContent = (p: { orgId: number }) => {
     const t = useStore(tab)
         , st = view.useStatus()
         , orgs = view.data.childs
-        , orgMap: Record<number, string> = {}
 
 
     if (st == 'ok' && orgs) {
@@ -83,27 +83,17 @@ const TabContent = (p: { orgId: number }) => {
 
     return t == 'prices'
         ? <TreeList store={products} status={st}>
-            {(it, level) => it.prices
-                ? <div
+            {(it, level) =>
+                <PriceList
                     key={it.id}
-                    className={it.prices ? sty.prices : sty.price}
+                    href={`${p.orgId}/${it.id}`}
+                    level={level} it={it}
+                    removeStoreFactory={getRemove}
                 >
-                    <Link href={`${p.orgId}/${it.id}`} style={{ textIndent: level * 40 + 'px' }}>{it.name}</Link>
                     {
-                        it.price
-                            ? <b>{it.price}</b>
-                            : it.prices?.map(it => <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)} style={{ textIndent: level * 80 + 'px' }}>
-                                <span>{orgMap[it.orgId!]}</span>
-                                <b>{it.price}</b>
-                            </RemoveToggler>)
+                        it => <Link href={`${it.orgId}`}>{orgMap[it.orgId!]}</Link>
                     }
-                </div>
-                : it.price
-                    ? <RemoveToggler key={it.id} id={it.id} store={getRemove(it.id)}>
-                        <Link href={`${p.orgId}/${it.id}`} style={{ textIndent: level * 80 + 'px' }}>{it.name}</Link>
-                        <b>{it.price}</b>
-                    </RemoveToggler>
-                    : <></>
+                </PriceList>
             }</TreeList>
             : <></>
 

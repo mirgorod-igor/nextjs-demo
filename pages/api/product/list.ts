@@ -5,19 +5,13 @@ import 'lib/ext'
 import {sleep} from 'utils/sleep'
 
 
-type Pr = {
-	value: number
-	childs?: Price[]
-}
-
 type Node = IdName & {
-	price?: number
 	prices?: Price[]
 	parentId?: number|null
 	childs?: Node[]
 }
 
-const loadRelationProducts = async (ids: number[], childs?: Node[], prices?: Record<number, Pr>) => {
+const loadRelationProducts = async (ids: number[], childs?: Node[], groupedPrices?: Record<number, Price[]>) => {
 	const items: Node[] = await prisma.product.findMany({
 		select: {
 			id: true, name: true, parentId: true
@@ -29,24 +23,25 @@ const loadRelationProducts = async (ids: number[], childs?: Node[], prices?: Rec
 
 	const pids = new Set<number>()
 	for (const it of items) {
-		const pr = prices?.[it.id]
-		if (pr) {
-			if (pr.value)
-				it.price = pr.value
-			else
-				it.prices = pr.childs
-		}
-
+		it.prices = groupedPrices?.[it.id]
 
 		if (childs)
-			it.childs = childs.filter(ch => (ch.parentId == it.id && (ch.parentId = undefined, true)))
+			it.childs = childs.filter(ch =>
+				(ch.parentId == it.id && (ch.parentId = undefined, true))
+			)
+
+		if (!it.childs?.length)
+			delete it.childs
 
 		if (it.parentId)
 			pids.add(it.parentId)
 	}
 
-
-	return pids.size ? await loadRelationProducts(Array.from(pids.values()), items) : items
+	return pids.size
+		? await loadRelationProducts(
+			Array.from(pids.values()), items, groupedPrices
+		)
+		: items
 }
 
 
@@ -100,23 +95,37 @@ export default async function handler(
 					}
 				},
 				skip, take,
-				where: { orgId, productId: { not: null } }
+				where: {
+					orgId, productId: { not: null }
+				}
 			}),
 			prisma.price.count({
-				where: { orgId, productId: { not: null } }
+				where: {
+					orgId, productId: { not: null }
+				}
 			})
 		])
 
+		const productIds = prices.map(it => it.productId!)
 
-		console.log('prices', prices)
+		const groupedPrices = prices.reduce<Record<number, Price[]>>((res, it) => {
+			(res[it.productId!] || (res[it.productId!] = [])).push(it)
+			// @ts-ignore, чтобы не отдавать наружу лишние данные
+			delete it.productId
+			if (!it.childs?.length)
+				// @ts-ignore, чтобы не отдавать наружу лишние данные
+				delete it.childs
+			return res
+		}, {})
+
+
+		console.log('prices', groupedPrices)
 
 		// собираем productId
 		const items = await loadRelationProducts(
-			prices.map(it => it.productId!),
+			productIds,
 			undefined,
-			prices.reduce((res, it) => ((res[it.productId!] = {
-				value: it.price, childs: it.childs
-			}), res), {})
+			groupedPrices
 		)
 
 		res.json({ items, total })

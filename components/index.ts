@@ -8,6 +8,7 @@ export {default as Select} from './Select'
 
 export {default as TreeList, Tree} from './TreeList'
 export {default as OrgList} from './OrgList'
+export {default as PriceList, Prices} from './PriceList'
 
 
 
