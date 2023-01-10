@@ -37,7 +37,7 @@ export const Tree = <T extends IdName,>(p: TreeProps<T>) => {
 
 
 type Props<T extends IdName> = {
-    href: (it: T, level: number) => string
+    href: (it: T, level: number) => string|null|undefined|false
     children: Children<T>
     status?: api.Status
     store: store.PagedList<T>

@@ -2,7 +2,7 @@ import {useEffect} from 'react'
 import {GetServerSideProps, NextPage} from 'next'
 import Link from 'next/link'
 
-import {NewItem, Input, Select, List, OrgList} from 'components'
+import {NewItem, Input, Select, List, OrgList, TreeList} from 'components'
 
 import {region, product, org, fetchData} from 'stores/home'
 import {regionList} from 'stores'
@@ -77,6 +77,18 @@ const TabButton = (p: { num, title }) => <>
 	<label htmlFor={'toggler' + p.num}>{p.title}</label>
 </>
 
+
+const ProductList = () => {
+	return <TreeList href={it => `product/${it.id}`} store={product.list}>
+		{
+			(it, level) => <div key={it.id} className={sty.product}>
+				{new Array(level).fill(<u />)}
+				<Link href={`product/${it.id}`}>{it.name}</Link>
+			</div>
+		}
+	</TreeList>
+}
+
 const Home: NextPage<Props> = p => {
 	useEffect(() => {
 		fetchData()
@@ -103,9 +115,7 @@ const Home: NextPage<Props> = p => {
 				<NewOrg />
 			</div>
 			<div>
-				<List store={product.list}>{
-					it => <Link href={`product/${it.id}`}>{it.name}</Link>
-				}</List>
+				<ProductList />
 				<hr />
 				<NewProduct />
 			</div>

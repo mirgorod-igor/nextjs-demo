@@ -48,15 +48,18 @@ const loadRelationProducts = async (ids: number[], childs?: Node[], groupedPrice
 const findMany = async (skip?: number, take?: number) =>
 	await prisma.product.findMany({
 		select: {
-			id: true, name: true
+			id: true, name: true, childs: {
+				select: { id: true, name: true }
+			}
 		},
 		where: {
 			parentId: null
 		},
 		skip, take,
-		orderBy: {
-			id: 'asc'
-		}
+		orderBy: [
+			{ catId: 'asc' },
+			{ id: 'asc' }
+		]
 	})
 
 

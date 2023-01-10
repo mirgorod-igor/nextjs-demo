@@ -86,19 +86,21 @@ const TabContent = (p: { orgId: number }) => {
 
     return t == 'prices'
         ? <TreeList href={(it, l) => `/org/${p.orgId}/${it.id}`} store={products} status={st}>
-            {(it, level) =>
-                <PriceList
-                    key={it.id}
-                    href={`${p.orgId}/${it.id}`}
-                    level={level} it={it}
-                    removeStoreFactory={removeStoreFactory}
-                >
-                    {
-                        it => <Link href={`${it.orgId}`}>{orgMap[it.orgId!]}</Link>
-                    }
-                </PriceList>
-            }</TreeList>
-            : <></>
+            {
+                (it, level) =>
+                    <PriceList
+                        key={it.id}
+                        href={`${p.orgId}/${it.id}`}
+                        level={level} it={it}
+                        removeStoreFactory={removeStoreFactory}
+                    >
+                        {
+                            it => <Link href={`${it.orgId}`}>{orgMap[it.orgId!]}</Link>
+                        }
+                    </PriceList>
+            }
+        </TreeList>
+        : <></>
 
 }
 
