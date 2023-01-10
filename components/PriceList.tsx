@@ -43,14 +43,14 @@ const PriceList = (p: Props) => {
         , cn = hasChilds ? sty.prices : sty.item
 
     return <div className={cn}>
-        <div>
+        <div className={'mr-'+(p.level*8)}>
             {new Array(p.level).fill(<u/>)}
             <Link href={p.href}>{p.it.name}</Link>
         </div>
         {
-            p.it.prices &&
+            !!p.it.prices &&
                 <Prices
-                    items={p.it.prices} level={p.level}
+                    level={p.level} items={p.it.prices}
                     removeStoreFactory={p.removeStoreFactory}
                     children={p.children}
                 />

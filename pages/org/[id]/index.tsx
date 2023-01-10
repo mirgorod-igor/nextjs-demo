@@ -68,7 +68,7 @@ const tab = atom<TabId>('prices')
 
 
 const removeStores: Record<number, store.Remove> = {}
-const getRemove = (id: number) =>
+const removeStoreFactory = (id: number) =>
     removeStores[id] || (removeStores[id] = new RemoveItem('price', id))
 
 
@@ -85,13 +85,13 @@ const TabContent = (p: { orgId: number }) => {
     }
 
     return t == 'prices'
-        ? <TreeList store={products} status={st}>
+        ? <TreeList href={(it, l) => `/org/${p.orgId}/${it.id}`} store={products} status={st}>
             {(it, level) =>
                 <PriceList
                     key={it.id}
                     href={`${p.orgId}/${it.id}`}
                     level={level} it={it}
-                    removeStoreFactory={getRemove}
+                    removeStoreFactory={removeStoreFactory}
                 >
                     {
                         it => <Link href={`${it.orgId}`}>{orgMap[it.orgId!]}</Link>

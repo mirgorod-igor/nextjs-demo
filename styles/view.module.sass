@@ -29,6 +29,7 @@
     display: grid
     grid-template-columns: 1fr
     grid-template-rows: minmax(20px, auto)
+    column-gap: 16px
     height: fit-content
 
     font-size: 0.9rem
@@ -72,7 +73,7 @@
         column-gap: 8px
         flex: 1
         > u
-            flex: 0 0 5%
+            flex: 0 0 4%
         > a
             width: fit-content
             &:last-of-type
@@ -93,11 +94,11 @@
     > div
         display: flex
         justify-content: space-between
-        column-gap: 8px
+        column-gap: 16px
         width: 100%
 
         > u
-            flex: 0 0 5%
+            flex: 0 0 4%
         > a
             width: fit-content
             &:last-of-type
@@ -120,6 +121,7 @@
         width: 90%
 @media screen and (max-width: 1200px)
     .main
+        display: flex
         flex-flow: column
         .card
             grid-template-columns: 1fr 2fr

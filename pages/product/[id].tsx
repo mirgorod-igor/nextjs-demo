@@ -71,7 +71,7 @@ const _Prices = () => {
     return <div className={sty.list + wait}>
         {
             view?.childs?.map(it =>
-                <Tree item={it} level={0}>
+                <Tree key={it.id} href={it => ''+it.id} item={it} level={0}>
                     {
                         (it, level) =>
                             <PriceList key={it.id} level={level} href={`${it.id}`} it={it} removeStoreFactory={removeStoreFactory}>
@@ -84,7 +84,7 @@ const _Prices = () => {
         {
             view?.prices &&
                 <div className={sty.prices}>
-                    <Prices items={view.prices} level={-1} removeStoreFactory={removeStoreFactory}>
+                    <Prices level={-1} items={view.prices} removeStoreFactory={removeStoreFactory}>
                         {it => <Link href={`/org/${it.orgId}`}>{orgs[it.orgId!]}</Link>}
                     </Prices>
                 </div>

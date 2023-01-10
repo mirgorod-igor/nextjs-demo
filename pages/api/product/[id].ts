@@ -19,7 +19,7 @@ function collectOrgIds(data: Product|Price, orgIds: Set<number>) {
             collectOrgIds(it, orgIds)
 }
 
-const loadRelations = async (data: Product, orgIds: Set<number>) => {
+const loadRelations = async (data: Product, orgId: number|undefined, orgIds: Set<number>) => {
     data.childs = await prisma.product.findMany({
         select: {
             id: true, name: true,
@@ -31,6 +31,9 @@ const loadRelations = async (data: Product, orgIds: Set<number>) => {
                             id: true, orgId: true, price: true
                         }
                     }
+                },
+                where: {
+                    orgId
                 }
             }
         },
@@ -43,7 +46,7 @@ const loadRelations = async (data: Product, orgIds: Set<number>) => {
         collectOrgIds(ch, orgIds)
 
     await Promise.all(
-        data.childs!.map(it => loadRelations(it, orgIds))
+        data.childs!.map(it => loadRelations(it, orgId, orgIds))
     )
 
     if (!data.childs!.length)
@@ -93,6 +96,7 @@ export default async function handler(
                     }
                 },
                 where: { orgId },
+                orderBy: [{ orgId: 'asc'}, {id: 'asc' }]
             },
             parent: {
                 select: { id: true, name: true }
@@ -105,7 +109,7 @@ export default async function handler(
 
     if (!!data) {
         collectOrgIds(data, orgIds)
-        await loadRelations(data, orgIds)
+        await loadRelations(data, orgId,orgIds)
     }
 
     const orgs = await prisma.org.findMany({

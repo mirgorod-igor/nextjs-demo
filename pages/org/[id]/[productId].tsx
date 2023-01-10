@@ -12,6 +12,8 @@ import {product} from 'stores/view/product'
 import {RemoveItem} from 'stores'
 
 import sty from 'styles/view.module.sass'
+import {mockProviders} from 'next-auth/client/__tests__/helpers/mocks'
+import id = mockProviders.github.id
 
 
 
@@ -68,7 +70,7 @@ const Card = () => {
 
 const removeStores: Record<number, store.Remove> = {}
 
-const getRemove = (id: number) =>
+const removeStoreFactory = (id: number) =>
     removeStores[id] || (removeStores[id] = new RemoveItem('price', id))
 
 
@@ -83,7 +85,8 @@ const tab = atom<TabId>('prices')
 
 
 const PriceList = () => {
-    const st = product.useStatus()
+    const {query: { id }} = useRouter()
+        , st = product.useStatus()
         , {view, orgs} = product.data ?? {}
         , { prices, childs } = view ?? {}
         , wait = st == 'wait' ? ' ' + sty.wait : ''
@@ -93,18 +96,18 @@ const PriceList = () => {
     return <div className={sty.list + wait}>
         {
             childs?.map(it =>
-                <Tree key={it.id} item={it} level={0}>
+                <Tree key={it.id} href={p => `/org/${id}/${p.id}`} item={it} level={0}>
                     {
                         (prod, level) => <div className={sty.prices}>
                             <Prices
                                 level={level}
                                 items={prod.prices!}
-                                removeStoreFactory={getRemove}
+                                removeStoreFactory={removeStoreFactory}
                             >
                                 {
                                     pr => <>
-                                        <Link href={`/org/${pr.orgId}`}>{orgs[pr.orgId!]}</Link>
-                                        <Link href={`/org/${pr.orgId}/${prod.id}`}>{prod.name}</Link>
+                                        <Link href={`/org/${id}`}>{orgs[pr.orgId!]}</Link>
+                                        <Link href={`/org/${id}/${prod.id}`}>{prod.name}</Link>
                                     </>
                                 }
                             </Prices>
@@ -114,15 +117,16 @@ const PriceList = () => {
             )
         }
         {
-            !!view && !onePrice && <div className={sty.prices}>
-                <Prices
-                    level={-1}
-                    items={view.prices!}
-                    removeStoreFactory={getRemove}
-                >
-                    {pr => <Link href={`/org/${pr.orgId}`}>{orgs?.[pr.orgId!]}</Link>}
-                </Prices>
-            </div>
+            !!view && !onePrice &&
+                <div className={sty.prices}>
+                    <Prices
+                        level={-1}
+                        items={view.prices!}
+                        removeStoreFactory={removeStoreFactory}
+                    >
+                        {it => <Link href={`/org/${it.orgId}`}>{orgs?.[it.orgId!]}</Link>}
+                    </Prices>
+                </div>
         }
     </div>
 }
