@@ -2,7 +2,7 @@ import type {AppProps} from 'next/app'
 
 import {Inter} from '@next/font/google'
 
-import 'lib/ext'
+import 'lib/std'
 
 import 'styles/globals.sass'
 

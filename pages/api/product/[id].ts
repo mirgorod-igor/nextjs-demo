@@ -2,10 +2,24 @@ import {NextApiRequest, NextApiResponse} from 'next'
 
 
 import prisma from 'lib/prisma'
-import 'lib/ext'
+import 'lib/std'
 
 
-const loadRelations = async (data: Product) => {
+function collectOrgIds(data: Product|Price, orgIds: Set<number>) {
+    if ('orgId' in data)
+        orgIds.add(data.orgId!)
+
+    if ('prices' in data) {
+        for (const it of data.prices!) {
+            collectOrgIds(it, orgIds)
+        }
+    }
+    if (!!data.childs)
+        for (const it of data.childs)
+            collectOrgIds(it, orgIds)
+}
+
+const loadRelations = async (data: Product, orgIds: Set<number>) => {
     data.childs = await prisma.product.findMany({
         select: {
             id: true, name: true,
@@ -25,7 +39,12 @@ const loadRelations = async (data: Product) => {
         }
     })
 
-    await Promise.all(data.childs!.map(ch => loadRelations(ch)))
+    for (const ch of data.childs)
+        collectOrgIds(ch, orgIds)
+
+    await Promise.all(
+        data.childs!.map(it => loadRelations(it, orgIds))
+    )
 
     if (!data.childs!.length)
         delete data.childs
@@ -63,20 +82,17 @@ export default async function handler(
             },
             prices: {
                 select: {
-                    id: true, org: { select: { id: true, name: true } }, price: true,
+                    id: true, orgId: true, price: true,
                     childs: {
                         select: {
-                            id: true, price: true,
-                            org: {
-                                select: { id: true, name: true }
-                            }
+                            id: true, price: true, orgId: true
                         },
                         where: {
                             price: { not: null }
                         }
                     }
                 },
-                where: orgId ? { orgId } : undefined,
+                where: { orgId },
             },
             parent: {
                 select: { id: true, name: true }
@@ -85,12 +101,31 @@ export default async function handler(
         where: { id }
     })
 
-    if (data)
-        await loadRelations(data)
+    const orgIds = new Set<number>()
+
+    if (!!data) {
+        collectOrgIds(data, orgIds)
+        await loadRelations(data, orgIds)
+    }
+
+    const orgs = await prisma.org.findMany({
+        select: {
+            id: true, name: true
+        },
+        where: {
+            id: { in: Array.from(orgIds.values()) }
+        }
+    })
+
 
     const status: api.Status = 'ok'
 
     console.log('product', data)
 
-    res.json({ status, data })
+    res.json({
+        status,
+        data: {
+            view: data, orgs: orgs.assoc('id', 'name')
+        }
+    })
 }

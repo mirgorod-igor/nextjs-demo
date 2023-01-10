@@ -13,7 +13,6 @@ interface TreeItem<T> {
 
 interface Price extends Id {
     orgId?: number
-    org?: IdName
     price?: number|null
     childs?: Price[]
 }

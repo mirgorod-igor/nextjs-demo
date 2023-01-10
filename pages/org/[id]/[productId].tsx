@@ -6,9 +6,9 @@ import {useRouter} from 'next/router'
 import {useStore} from '@nanostores/react'
 import {atom} from 'nanostores'
 
-import {TabButtons, Tree, Prices, Breadcrumbs} from 'components'
+import {Breadcrumbs, Prices, TabButtons, Tree} from 'components'
 
-import {orgMap, orgs, product} from 'stores/view/product'
+import {product} from 'stores/view/product'
 import {RemoveItem} from 'stores'
 
 import sty from 'styles/view.module.sass'
@@ -20,41 +20,46 @@ const breadcrumbs: [string, string][] = [
 ]
 
 const BC = (p: { orgId: number }) => {
-    const ready = orgs.useStatus()
+    const ready = product.useStatus()
+        , orgs =  product.data?.orgs ?? {}
 
     return <Breadcrumbs
-        items={ready ? [...breadcrumbs, [`/org/${p.orgId}`, orgMap[p.orgId]]]  : breadcrumbs}
+        items={ready ? [...breadcrumbs, [`/org/${p.orgId}`, orgs[p.orgId]]]  : breadcrumbs}
     />
 }
 
 
 const Card = () => {
     const st = product.useStatus()
-        , item = product.data
-        , { price, org } = item.prices?.[0] ?? { }
         , wait = st == 'wait' ? ' '+sty.wait : ''
+        , {view, orgs} = product.data ?? {}
+        , { price, orgId } = view?.prices?.[0] ?? { }
 
     return <div className={sty.card + wait}>
-        <i>{item.category?.name ?? 'Наименование'}</i>
-        <Link href={`/product/${item.id}`}>{item.name}</Link>
+        <i>{view?.category?.name ?? 'Наименование'}</i>
+        <Link href={`/product/${view?.id}`}>{view?.name}</Link>
         {
-            !!item.parent && <>
+            !!view?.parent && <>
                 <i>Группа</i>
-                <Link href={`/product/${item.parent.id}`}>{item.parent.name}</Link>
+                <Link href={`/product/${view.parent.id}`}>{view.parent.name}</Link>
             </>
         }
         {
-            !!item.group && <>
+            !!view?.group && <>
                 <i>Категория</i>
-                <span>{item.group.name}</span>
+                <span>{view.group.name}</span>
             </>
         }
-        <i>Производитель</i>
-        <Link href={`/org/${org?.id}`}>{org?.name}</Link>
         {
-            !!price && <>
-                <i>Цена</i>
-                <span>{price}</span>
+            !!orgId && <>
+                <i>Производитель</i>
+                <Link href={`/org/${orgId}`}>{orgs?.[orgId!]}</Link>
+                {
+                    !!price && <>
+                    <i>Цена</i>
+                    <span>{price}</span>
+                    </>
+                }
             </>
         }
     </div>
@@ -79,9 +84,9 @@ const tab = atom<TabId>('prices')
 
 const PriceList = () => {
     const st = product.useStatus()
-        , ost = orgs.useStatus()
-        , {childs, prices} = product.data
-        , wait = st == 'wait' || ost == 'wait' ? ' ' + sty.wait : ''
+        , {view, orgs} = product.data ?? {}
+        , { prices, childs } = view ?? {}
+        , wait = st == 'wait' ? ' ' + sty.wait : ''
 
     const onePrice = (prices?.length ?? 0) == 1 && !!prices![0].price
 
@@ -98,7 +103,7 @@ const PriceList = () => {
                             >
                                 {
                                     pr => <>
-                                        <Link href={`/org/${pr.orgId}`}>{orgMap[pr.orgId!]}</Link>
+                                        <Link href={`/org/${pr.orgId}`}>{orgs[pr.orgId!]}</Link>
                                         <Link href={`/org/${pr.orgId}/${prod.id}`}>{prod.name}</Link>
                                     </>
                                 }
@@ -109,13 +114,13 @@ const PriceList = () => {
             )
         }
         {
-            !onePrice && <div className={sty.prices}>
+            !!view && !onePrice && <div className={sty.prices}>
                 <Prices
                     level={-1}
-                    items={product.data.prices!}
+                    items={view.prices!}
                     removeStoreFactory={getRemove}
                 >
-                    {pr => <Link href={`/org/${pr.org?.id}`}>{pr.org?.name}</Link>}
+                    {pr => <Link href={`/org/${pr.orgId}`}>{orgs?.[pr.orgId!]}</Link>}
                 </Prices>
             </div>
         }
@@ -129,7 +134,8 @@ const TabContent = () => {
 }
 
 const Details = () => {
-    const onePrice = (product.data.prices?.length ?? 0) == 1 && !!product.data.prices![0].price
+    const {view} = product.data ?? {}
+        , onePrice = (view?.prices?.length ?? 0) == 1 && !!view?.prices![0].price
         , items = product.useStatus() == 'wait' ? [] : onePrice ? tabs.slice(1) : tabs
 
     return <div className={sty.details}>
@@ -148,10 +154,7 @@ const ProductPage: NextPage = () => {
 
     useEffect(() => {
         if (orgId) {
-            Promise.all([
-                product.fetch(productId, { orgId }),
-                orgs.fetch()
-            ])
+            product.fetch(productId, { orgId })
         }
     }, [orgId])
 

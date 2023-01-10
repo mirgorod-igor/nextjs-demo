@@ -3,7 +3,7 @@ import {NextApiRequest, NextApiResponse} from 'next'
 import {Org} from '@prisma/client'
 
 import prisma from 'lib/prisma'
-import 'lib/ext'
+import 'lib/std'
 
 import {sleep} from 'utils/sleep'
 

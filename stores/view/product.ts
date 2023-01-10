@@ -26,7 +26,7 @@ class OrgList extends PagedList<TreeItem<Org>> {
 
 
 export const
-    product = new ViewItem<Product>('product'),
+    product = new ViewItem<{ view: Product, orgs: Record<number, string> }>('product'),
     orgs = new List<IdName>('org'),
     orgMap: Record<number, string> = {}
 

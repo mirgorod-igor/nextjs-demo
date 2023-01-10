@@ -6,10 +6,9 @@ import {useRouter} from 'next/router'
 import {atom} from 'nanostores'
 import {useStore} from '@nanostores/react'
 
-import {Prices, PriceList, TabButtons, Tree, Breadcrumbs} from 'components'
+import {Breadcrumbs, Prices, PriceList, TabButtons, Tree} from 'components'
 
-import {orgs, product} from 'stores/view/product'
-
+import {product} from 'stores/view/product'
 import {RemoveItem} from 'stores'
 
 import sty from 'styles/view.module.sass'
@@ -25,21 +24,21 @@ const breadcrumbs: [string, string][] = [
 const Card = () => {
     const st = product.useStatus()
         , wait = st == 'wait' ? ' '+sty.wait : ''
-        , item = product.data ?? {}
+        , item = product.data.view ?? {}
 
     return <div className={sty.card + wait}>
         <i>{item.category?.name ?? 'Наименование'}</i>
         <span>{item.name}</span>
         {
-            !!item.group && <>
-                <i>Категория</i>
-                <span>{item.group.name}</span>
+            !!item.parent && <>
+                <i>Группа</i>
+                <Link href={`${item.parent.id}`}>{item.parent.name}</Link>
             </>
         }
         {
-            item.parent && <>
-                <i>Группа</i>
-                <Link href={`${item.parent.id}`}>{item.parent.name}</Link>
+            !!item.group && <>
+                <i>Категория</i>
+                <span>{item.group.name}</span>
             </>
         }
     </div>
@@ -65,35 +64,28 @@ const tab = atom<TabId>('prices')
 
 const _Prices = () => {
     const st = product.useStatus()
-        , {childs, prices} = product.data
-        , ost = orgs.useStatus()
-        , wait = ost == 'wait' || st == 'wait' ? ' '+sty.wait : ''
-        , orgMap: Record<number, string> = {}
+        , {view, orgs} = product.data ?? {}
+        , wait = st == 'wait' ? ' '+sty.wait : ''
 
-
-    if (ost == 'ok') {
-        for (const {id, name} of orgs.items)
-            orgMap[id] = name
-    }
 
     return <div className={sty.list + wait}>
         {
-            childs?.map(it =>
+            view?.childs?.map(it =>
                 <Tree item={it} level={0}>
                     {
                         (it, level) =>
                             <PriceList key={it.id} level={level} href={`${it.id}`} it={it} removeStoreFactory={removeStoreFactory}>
-                                {it => <Link href={`/org/${it.orgId}`}>{orgMap[it.orgId!]}</Link>}
+                                {it => <Link href={`/org/${it.orgId}`}>{orgs[it.orgId!]}</Link>}
                             </PriceList>
                     }
                 </Tree>
             )
         }
         {
-            prices &&
+            view?.prices &&
                 <div className={sty.prices}>
-                    <Prices items={prices!} level={-1} removeStoreFactory={removeStoreFactory}>
-                        {it => <Link href={`/org/${it.org?.id}`}>{it.org?.name}</Link>}
+                    <Prices items={view.prices} level={-1} removeStoreFactory={removeStoreFactory}>
+                        {it => <Link href={`/org/${it.orgId}`}>{orgs[it.orgId!]}</Link>}
                     </Prices>
                 </div>
         }
@@ -126,10 +118,7 @@ const ProductPage: NextPage = () => {
 
     useEffect(() => {
         if (id) {
-            Promise.all([
-                product.fetch(id),
-                orgs.fetch()
-            ])
+            product.fetch(id)
         }
     }, [id])
 

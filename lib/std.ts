@@ -16,11 +16,22 @@ if (!String.prototype.hasOwnProperty('safeInt'))
     })
 
 if (!Array.prototype.hasOwnProperty('groupBy'))
-    Array.prototype.groupBy = function<T, K = T[keyof T]>(keyName: keyof T) {
+    Array.prototype.groupBy = function<T, V = T[keyof T]>(keyName: keyof T) {
         return this.reduce((r, it) =>
             ((r[it[keyName]] || (r[it[keyName]] = [])).push(it), r),
             // @ts-ignore
-            {} satisfies Record<K, T[]>
+            {} as Record<V, T[]>
+        )
+    }
+
+
+if (!Array.prototype.hasOwnProperty('assoc'))
+    Array.prototype.assoc = function<
+        T extends Record<string, any>, KN extends keyof T, VN extends keyof T
+    >(this: T[], nameKey: KN, nameValue: VN) {
+        return this.reduce((r, it) =>
+            (r[it[nameKey]] = it[nameValue], r),
+            {} as Record<T[KN], T[VN]>
         )
     }
 
