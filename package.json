@@ -14,7 +14,7 @@
     "prisma:migrate-dev": "npx prisma migrate dev",
     "prisma:migrate-reset": "npx prisma migrate reset",
     "prisma:gen": "npx prisma generate",
-    "prisma:db-push": "npx prisma db push --force-reset",
+    "prisma:db-push": "npx prisma db push",
     "prisma:db-seed": "npx prisma db seed",
     "prisma:format": "npx prisma format",
     "vercel-build": "prisma generate && next build"

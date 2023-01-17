@@ -314,12 +314,13 @@ const main = async () => {
 	const regions = await (new Promise<Region[]>(readRegions))
 
 	try {
-		await prisma.$executeRaw`SET foreign_key_checks = 0`
-		const tables = ['prices', 'products', 'product_groups', 'product_attrs', 'orgs', 'org_services', 'regions', 'societies']
+		//await prisma.$executeRaw`SET foreign_key_checks = 0`
+		/*await prisma.$executeRaw`ALTER TABLE products DISABLE TRIGGER ALL`
+		const tables = ['prices', 'products', 'product_attrs', 'product_groups', 'orgs', 'org_services', 'regions', 'societies']
 		for (const table of tables) {
 			await prisma.$executeRawUnsafe(`truncate table ${table}`)
 		}
-		await prisma.$executeRaw`SET foreign_key_checks = 1`
+		await prisma.$executeRaw`ALTER TABLE products ENABLE TRIGGER ALL`*/
 
 		await prisma.region.createMany({
 			data: regions
